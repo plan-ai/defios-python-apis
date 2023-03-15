@@ -13,6 +13,33 @@ def fetch_progress_json(progress_items):
 
 
 def fetch_homepage(token):
+    """
+    Used to load data to be shown on homepage that opens to a user
+    
+    Parameters
+    --------------------
+    token:string
+                  Unique jwt identifier of the user
+
+    Returns
+    --------------------
+    issues -> List[Issues]:
+            Return list of Issue model raw json of the issues with the highest stake amount
+    tokens -> List[Token]:
+                Return list of Token model raw json of 4 randomly sampled Token models without their mongoid
+    roadmap -> Roadmap:
+                Returns raw json of roadmap model with the highest number of active objectives
+    projects -> List[Projects]:
+                 Returns list of projects ordered by community_health in descending order and secondarily by num_open_issues in descending order
+    paths -> List[List]
+                key(progress_type:str):[
+                    [
+                        progress_text:str,
+                        progress_true:bool
+                    ]
+                ]
+             Returns an array or array that lists how far the use rhas advanced in each of the three respective walkthrough
+    """
     isAuthorized, resp = validate_user(token)
     if not isAuthorized:
         return resp

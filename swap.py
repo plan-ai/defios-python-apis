@@ -3,6 +3,21 @@ from authentication import validate_user
 from flask import make_response, jsonify
 
 def fetch_token_details(token, token_symbol):
+    """
+    List details regarding a token 
+    
+    Parameters
+    --------------------
+    token:string
+                  Unique jwt identifier of the user
+    token_symbol:string
+                  Symbol of token regarding which data is to be queried
+
+    Returns
+    --------------------
+    message -> Token:
+            Return token model raw json
+    """
     isAuthorized, resp = validate_user(token)
     if not isAuthorized:
         return resp
@@ -20,6 +35,23 @@ def fetch_token_details(token, token_symbol):
 
 
 def fetch_token_list(token):
+    """
+    Used to fetch list of tokens
+    
+    Parameters
+    --------------------
+    token:string
+                  Unique jwt identifier of the user
+
+    Returns
+    --------------------
+    message -> List[Json]:
+            List[
+                token_image_url: Link of token icon,
+                token_spl_addr: Public address where token smart contract is hosted,
+                token_symbol: Symbol of token
+            ]
+    """
     isAuthorized, resp = validate_user(token)
     if not isAuthorized:
         return resp

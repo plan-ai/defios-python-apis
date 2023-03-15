@@ -6,8 +6,14 @@ import requests
 
 
 def verify_gh_access_token(github_uid, gh_access_token):
+    """
+    Used as an internal helper function to validate if the
+    github_uid and gh_acess_token sent into the function
+    are of convergent origin and return the name and
+    avatar url(github profile pic) if true
+    """
     url = "https://api.github.com/user"
-    headers = {
+    headers = { 
         'Accept': 'application/vnd.github+json',
         'Authorization': f'Bearer {gh_access_token}',
         'X-GitHub-Api-Version': '2022-11-28'
@@ -60,6 +66,31 @@ def set_progress_init(user):
 
 
 def generate_jwt(github_uid, firebase_uid, gh_access_token, pub_key):
+    """
+    Used to generate a unique jwt token for a user
+    to authenticate requests to the server from the
+    user
+    
+    Parameters
+    --------------------
+    github_uid:string
+                  Unique github user id of the user's github account
+    firebase_uid:string
+                    Unique firebase uid of the user
+    gh_access_token:string
+                       Github access token of the user
+    pub_key:string
+               User's pubblic key on the solana blockchain
+               
+    
+    
+    Returns
+    --------------------
+    auth_creds:
+               Unique JWT token of the user that can be used to authenticate the user
+    firebase:
+             Unique firebase uid of the user
+    """
     try:
         is_gh_valid, user_gh_name, user_gh_profile_pic = verify_gh_access_token(
             github_uid, gh_access_token
@@ -108,6 +139,21 @@ def validate_user(token):
         return False, unauthorizedResponse
     
 def add_to_waitlist(email, wl_type="jobs"):
+    """
+    Used to add a user with given email to waitlist
+    
+    Parameters
+    --------------------
+    email:string
+                  Email of user to be added to waitlist
+    wl_type:string
+                  Waitlist type to which user must be added, defaults to jobs
+               
+    Returns
+    --------------------
+    message:
+            Indicates that the request was sucessful
+    """
     wl = Waitlist(
         waitlist_email=email,
         waitlist_type=wl_type

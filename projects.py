@@ -6,6 +6,22 @@ from utils import remove_dups_by_id
 import json
 
 def fetch_projects(token, request_params):
+    """
+    Used to push a firebase notif to the web frontend
+    
+    Parameters
+    --------------------
+    token:string
+                  Unique jwt identifier of the user to authenticate notif request, all users are set to admin for this demonstration
+    notif_json: json
+                Json data regarding the notif, contains the following data:
+                     user_github: Github uid of the user
+
+    Returns
+    --------------------
+    message:
+            Indicates whether the request was successful or not
+    """
     isAuthorized, resp = validate_user(token)
     if not isAuthorized:
         return resp
@@ -76,6 +92,25 @@ def fetch_projects(token, request_params):
     
 
 def fetch_projects_minified(token):
+    """
+    Used to fetch projects in a minified fashion
+    
+    Parameters
+    --------------------
+    token:string
+                  Unique jwt identifier of the user
+
+    Returns
+    --------------------
+    message -> List[Json]:
+            List[
+                project_name: Name of Project,
+                token_url: Url of image related to token of the project,
+                id: Project mongoid,
+                account:Name of project account,
+                project_url: Github link of project
+            ]
+    """
     isAuthorized, resp = validate_user(token)
     if not isAuthorized:
         return resp

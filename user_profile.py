@@ -4,6 +4,31 @@ from flask import make_response, jsonify
 
 
 def profile_contributions(token):
+    """
+    Used to fetch a users profile contributions
+    
+    Parameters
+    --------------------
+    token:string
+                  Unique jwt identifier of the user to authenticate notif request, all users are set to admin for this demonstration
+    Returns
+    --------------------
+    message -> List[Json]:
+            List[
+                contribution_amt: Amount given upon contribution by or to the user,
+                contribution_link: Github pull request link of contribution,
+                contribution_timestamp: Timestamp at which contribution occured,
+                contribution_token_icon:Icon url of token in which contributor was paid by or to the user,
+                contribution_token_symbol: Symbol of token in which contributor was paid by or to the user,
+                contribution_type: Wether they staked the money on the issue or got money from contributing to it,
+                contributor_github: Github UID of contributor,
+                contributor_name: Name of contributor,
+                contributor_profile_pic: Profile pic of contributor,
+                contributor_project_id: mongodb id of project on which contributor contributed,
+                contributor_project_name: Name of project in which contribution was made
+
+            ]
+    """
     isAuthorized, resp = validate_user(token)
     if not isAuthorized:
         return resp
@@ -17,6 +42,23 @@ def profile_contributions(token):
 
 
 def update_user_progress(token, progress_type, progress_title):
+    """
+    Used to update a users progress status
+    
+    Parameters
+    --------------------
+    token:string
+                  Unique jwt identifier of the user to authenticate notif request, all users are set to admin for this demonstration
+    progress_type: string
+                      Type of progress in walkthrough(developer,enterprise,maintainer) 
+    progress_title: string 
+                      Title of progression step in walkthrough passed                
+
+    Returns
+    --------------------
+    message:
+            Indicates whether the request was successful or not
+    """
     isAuthorized, resp = validate_user(token)
     if not isAuthorized:
         return resp

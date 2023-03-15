@@ -6,6 +6,36 @@ import json
 from utils import isfloat, remove_dups_by_id
 
 def fetch_issues(token, request_params):
+    """
+    Used to fetch issues given one or more set of filters
+    
+    Parameters
+    --------------------
+    token:string
+                  Unique jwt identifier of the user
+    request_params:json
+                    Set of filters to be applied to data, the available filters are:
+                       1) filter.pagesize
+                       2) filter.pageno
+                       3) search.issue_project_id
+                       4) search.issue_project_name
+                       5) filter.order_by
+                       6) filter.mine
+                       7) search.issue_title
+                       8) search.issue_state
+                       9) search.issue_stake_amount
+                       10) search.issue_stake_token_symbol
+                       11) search.issue_num_prs
+                       12) search.issue_creator_gh
+                       13) search.issue_tags
+                       14) first_id
+
+    Returns
+    --------------------
+    issues -> List[Issues]:
+            Return list of Issue model raw json of the flitered issues
+    
+    """
     isAuthorized, resp = validate_user(token)
     if not isAuthorized:
         return resp

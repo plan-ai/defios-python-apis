@@ -7,6 +7,19 @@ import firebase_admin
 
 
 def fetch_notifications(token):
+    """
+    Used to fetch unread notifs of a user
+    
+    Parameters
+    --------------------
+    token:string
+                  Unique jwt identifier of the user
+
+    Returns
+    --------------------
+    message -> List[Notif]:
+            Return list of notification model raw json without mongoid
+    """
     isAuthorized, resp = validate_user(token)
     if not isAuthorized:
         return resp
@@ -26,6 +39,21 @@ def fetch_notifications(token):
 
 
 def mark_notifs_as_read(token, reset=False):
+    """
+    Used to mark a notif as read or reset to False
+    
+    Parameters
+    --------------------
+    token:string
+                  Unique jwt identifier of the user
+    reset: bool
+                Boolean value which indicates wether to reset the notif read state to False, defaults to False
+
+    Returns
+    --------------------
+    message:
+            Indicates wether the request was successful or not
+    """
     isAuthorized, resp = validate_user(token)
     if not isAuthorized:
         return resp

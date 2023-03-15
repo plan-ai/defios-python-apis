@@ -4,6 +4,28 @@ from flask import jsonify, make_response
 import json
 
 def get_roadmaps(token, request_params):
+    """
+    Used to fetch roadmaps given one or more set of filters
+    
+    Parameters
+    --------------------
+    token:string
+                  Unique jwt identifier of the user
+    request_params:json
+                    Set of filters to be applied to data, the available filters are:
+                       1) filter.roadmap_total_stake
+                       2) filter.roadmap_active_objectives
+                       3) filter.roadmap_outlook
+                       4) filter.roadmap_outcome_types
+                       5) search.roadmap_creator_gh_name
+                       6) search.roadmap_title
+
+    Returns
+    --------------------
+    issues -> List[Issues]:
+            Return list of Roadmaps model raw json of the flitered roadmaps
+    
+    """
     isAuthorized, resp = validate_user(token)
     if not isAuthorized:
         return resp
