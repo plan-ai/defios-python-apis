@@ -23,7 +23,7 @@
 
 ### Setting up the API on your local
 
-1) To continue forward, setup a local mongodb instance(https://www.prisma.io/dataguide/mongodb/setting-up-a-local-mongodb-database) on your machine or connect with a remote mongodb instance. **Add the host or url link for your mongodb server or local name in mainapi.py line no.18, mongoengine.connect(host="")(for remote db) or mongoengine.connect("")(for local insrances).**
+1) To continue forward, setup a local mongodb instance(https://www.prisma.io/dataguide/mongodb/setting-up-a-local-mongodb-database) on your machine or connect with a remote mongodb instance. **Add the host or url link for your mongodb server or local name in mainapi.py line no.18, mongoengine.connect(host="")(for remote db) or mongoengine.connect("")(for local instances).**
 
 5) Run **python3 mainapi.py**, the flask application should start!!! 
 
