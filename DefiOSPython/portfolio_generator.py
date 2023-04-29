@@ -28,7 +28,7 @@ def generate_website(requestData):
     # Pushed the portfolio to a s3 bucket
     s3_resource = boto3.resource("s3")
     bucket = s3_resource.Bucket(bucketName)
-    key = requestData["social"]["email"].replace("@", "-").replace(".", "-") + ".html"
+    key = requestData["social"]["github_url"].replace("@", "-").replace(".", "-") + ".html"
     bucket.put_object(
         Body=portfolio, Key=key, ACL="public-read", ContentType="text/html"
     )
