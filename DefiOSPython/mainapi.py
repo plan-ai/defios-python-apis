@@ -1,16 +1,16 @@
 from flask import Flask, make_response, jsonify
 from flask_restful import Api, Resource, request
-from authentication import generate_jwt, add_to_waitlist
 import mongoengine
+from flask_cors import CORS
+from authentication import generate_jwt, add_to_waitlist
 from notifications import fetch_notifications, post_notifications, mark_notifs_as_read
 from projects import fetch_projects, fetch_projects_minified
 from issues import fetch_issues
-from user_profile import profile_contributions, generate_portfolio_website
-from user_profile import update_user_progress
+from user_profile import profile_contributions, update_user_progress
 from roadmaps import get_roadmaps
 from homepage import fetch_homepage
 from swap import fetch_token_details, fetch_token_list
-from flask_cors import CORS
+from portfolio_generator import generate_portfolio_website
 
 app = Flask(__name__)
 api = Api(app)

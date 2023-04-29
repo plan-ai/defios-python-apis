@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>{{ data['profile_name'] }} | Portfolio</title>
+    <!-- Meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href='https://fonts.googleapis.com/css?family=Lato:300,400,300italic,400italic' rel='stylesheet'
+        type='text/css'>
+    <link href='https://fonts.googleapis.com/css?family=Montserrat:400,700' rel='stylesheet' type='text/css'>
+
+    <!-- FontAwesome JS -->
+    <script src="https://userportfolios.s3.ap-south-1.amazonaws.com/all.min.js"></script>
+
+    <!-- Global CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+
+    <!-- Theme CSS -->
+    <link id="theme-style" rel="stylesheet" href="https://userportfolios.s3.ap-south-1.amazonaws.com/styles.css">
+</head>
+
+<body>
+    <header class="header">
+        <div class="container clearfix">
+            <img class="profile-image img-fluid float-left" src="{{ data['profile_pic_url'] }}" alt={{ data['profile_name'] }}
+                style="width: 200px; height: 200px; background-position: center center; background-repeat: no-repeat; border-radius: 50%;" />
+            <div class="profile-content float-left">
+                <h1 class="name">{{ data['profile_name'] }}</h1>
+                <h2 class="desc">{{ data['skill_desc'] }}</h2>
+                <ul class="social list-inline">
+                    {% if 'twitter_url' in data['social'] %}
+                    <li class="list-inline-item"><a href="{{ data['social']['twitter_url'] }}"><i
+                                class="fab fa-twitter"></i></a></li>
+                    {% endif %}
+                    {% if 'linkedin_url' in data['social'] %}
+                    <li class="list-inline-item"><a href="{{ data['social']['linkedin_url'] }}"><i
+                                class="fab fa-linkedin-in"></i></a></li>
+                    {% endif %}
+                    {% if 'github_url' in data['social'] %}
+                    <li class="list-inline-item"><a href="{{ data['social']['github_url'] }}"><i
+                                class="fab fa-github-alt"></i></a></li>
+                    {% endif %}
+                    {% if 'stack_overflow_url' in data['social'] %}
+                    <li class="list-inline-item"><a href="{{ data['social']['stack_overflow_url'] }}"><i
+                                class="fab fa-stack-overflow"></i></a></li>
+                    {% endif %}
+                </ul>
+            </div><!--//profile-->
+            <a class="btn btn-cta-primary float-right" href="mailto:{{ data['social']['email'] }}" target="_blank"><i
+                    class="fas fa-paper-plane"></i>Contact Me</a>
+        </div><!--//container-->
+    </header>
+
+    <div class="container sections-wrapper">
+        <div class="row">
+            <div class="primary col-lg-8 col-12">
+                <section class="about section">
+                    <div class="section-inner">
+                        <h2 class="heading">About Me</h2>
+                        <div class="content">
+                            <p>{{ data['about_me'] }}</p>
+                        </div><!--//content-->
+                    </div><!--//section-inner-->
+                </section><!--//section-->
+
+                {% if 'projects' in data %}
+                <section class="latest section">
+                    <div class="section-inner">
+                        <h2 class="heading">Projects</h2>
+                        <div class="content">
+
+                            <div class="item featured text-center">
+                                <h3 class="title">
+                                    <a href="{{data['projects'][0]['git_url']}}" target="_blank">
+                                        {{data['projects'][0]['title']}}
+                                    </a>
+                                </h3>
+                                <div class="featured-image has-ribbon">
+                                    <img class="img-fluid project-image" src="{{data['projects'][0]['proj_image']}}"
+                                        alt="project name" />
+                                </div>
+
+                                <div class="desc text-left">
+                                    <p>{{data['projects'][0]['proj_desc']}}</p>
+                                </div><!--//desc-->
+                                <a class="btn btn-cta-secondary" href="{{data['projects'][0]['proj_demo']}}"
+                                    target="_blank">View Demo</a>
+                            </div><!--//item-->
+                            {% if data['projects']|length > 1 %}
+                            <hr class="divider" />
+                            {% for i in range(1, data['projects']|length) %}
+                            <div class="item row">
+                                <img class="img-fluid project-image" src="{{data['projects'][i]['proj_image']}}" />
+                                <div class="desc col-md-8 col-12">
+                                    <h3 class="title">
+                                        <a href="{{data['projects'][i]['git_url']}}" target="_blank">
+                                            {{data['projects'][i]['title']}}
+                                        </a>
+                                    </h3>
+                                    <p class="mb-2">
+                                        {{data['projects'][i]['proj_desc']}}
+                                    </p>
+                                    <p><a class="more-link" href="{{data['projects'][i]['proj_demo']}}"><i
+                                                class="fas fa-external-link-alt"></i>View Demo</a></p>
+                                </div><!--//desc-->
+                            </div><!--//item-->
+                            {% endfor %}
+                            {% endif %}
+                        </div><!--//content-->
+                    </div><!--//section-inner-->
+                </section><!--//section-->
+                {% endif %}
+
+                {% if 'experience' in data %}
+                <section class="experience section">
+                    <div class="section-inner">
+                        <h2 class="heading">Work Experience</h2>
+                        <div class="content">
+                            {% for exp in data["experience"] %}
+                            <div class="item">
+                                <h3 class="title">{{exp.position}} -
+                                    <span class="place"><a href="{{exp.company_url}}">{{exp.company}}</a>
+                                    </span> <span class="year">
+                                        ({{exp.timeline}})</span>
+                                </h3>
+                                <p>
+                                    {{exp.summary}}
+                                </p>
+                            </div>
+                            {% endfor %}
+                        </div><!--//content-->
+                    </div><!--//section-inner-->
+                </section><!--//section-->
+                {% endif %}
+
+
+                <section class="experience section">
+                    <div class="section-inner">
+                        <h2 class="heading">Education</h2>
+                        <div class="content">
+                            {% for edu in data['education'] %}
+                            <div class="item">
+                                <h3 class="title"><a href="{{edu.college_url}}">{{edu.college_name}}</a>
+                                    <br><span class="place">
+                                        {{edu.degree_name}}</span> <br>
+                                    <span class="year">({{edu.timeline}})</span>
+                                </h3>
+                                <p>{{edu.summary}}</p>
+                            </div>
+                            {% endfor %}
+                        </div><!--//content-->
+                    </div><!--//section-inner-->
+                </section><!--//section-->
+
+            </div><!--//primary-->
+            <div class="secondary col-lg-4 col-12">
+                <aside class="info aside section">
+                    <div class="section-inner">
+                        <h2 class="heading sr-only">Basic Information</h2>
+                        <div class="content">
+                            <ul class="list-unstyled">
+                                <li><i class="fas fa-map-marker-alt"></i><span class="sr-only">Location:</span>{{
+                                    data['current_location'] }}</li>
+                                <li><i class="fas fa-envelope"></i><span
+                                        class="sr-only">data['social']['email']:</span><a href="#">{{
+                                        data['social']['email'] }}</a></li>
+                            </ul>
+                        </div><!--//content-->
+                    </div><!--//section-inner-->
+                </aside><!--//aside-->
+
+                {% if 'skills' in data %}
+                <aside class="skills aside section">
+                    <div class="section-inner">
+                        <h2 class="heading">Skills</h2>
+                        <div class="content">
+                            <div class="skillset">
+                                {% for skill in data['skills'] %}
+                                <div class="item">
+                                    <h3 class="level-title">{{ skill.skill_name }}<span class="level-label"
+                                            data-toggle="tooltip" data-placement="left" data-animation="true"><i
+                                                class="fas fa-info-circle"></i>
+                                            {{ skill.skill_level }}
+                                        </span></h3>
+                                    <div class="level-bar">
+                                        {% if skill.skill_level == 'Expert' %}
+                                        <div class="level-bar-inner" data-level="66%">
+                                        </div>
+                                        {% endif %}
+                                        {% if skill.skill_level == 'Pro' %}
+                                        <div class="level-bar-inner" data-level="40%">
+                                        </div>
+                                        {% endif %}
+                                        {% if skill.skill_level == 'Novice' %}
+                                        <div class="level-bar-inner" data-level="30%">
+                                        </div>
+                                        {% endif %}
+                                    </div><!--//level-bar-->
+                                </div><!--//item-->
+                                {% endfor %}
+
+                                <p><a class="more-link" href="{{ data['social']['linkedin_url'] }}"><i
+                                            class="fas fa-external-link-alt"></i></a>More on Linkedin</p>
+                            </div>
+                        </div><!--//content-->
+                    </div><!--//section-inner-->
+                </aside><!--//section-->
+                {% endif %}
+
+                {% if 'testimonials' in data %}
+                <aside class="testimonials aside section">
+                    <div class="section-inner">
+                        <h2 class="heading">Testimonials</h2>
+                        <div class="content">
+                            <div class="item">
+                                <blockquote class="quote">
+                                    <p><i class="fas fa-quote-left"></i>{{data['testimonials']['testimonial_desc']}}</p>
+                                </blockquote>
+                                <p class="source"><span
+                                        class="name">{{data['testimonials']['testimonial_name']}}</span><br />
+                                    <span class="title">{{data['testimonials']['testimonial_cred']}}</span>
+                                </p>
+                            </div><!--//item-->
+
+                            <p><a class="more-link" href="{{ data['social']['linkedin_url'] }}"><i
+                                        class="fas fa-external-link-alt"></i></a>More on Linkedin</p>
+
+                        </div><!--//content-->
+                    </div><!--//section-inner-->
+                </aside><!--//section-->
+                {% endif %}
+                {% if 'publications' in data %}
+                <aside class="education aside section">
+                    <div class="section-inner">
+                        <h2 class="heading">Publications</h2>
+                        <div class="content">
+                            {% for pubs in data['publications'] %}
+                            <div class="item">
+                                <h3 class="title"><i class="fas fa-graduation-cap"></i>{{pubs.title}}</h3>
+                                <h4 class="university">{{pubs.supervisor}}
+                                    <br><span class="journal-name">{{pubs.journal_name}}</span>
+                                </h4>
+                                <span class="year">{{pubs.publish_date}}</span><br>
+                                <span class="small"><a href="{{pubs.article_link}}">Full Article Link</a></span>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </aside>
+                {% endif %}
+                {% if 'achievements' in data %}
+                <aside class="list hackathons aside section">
+                    <div class="section-inner">
+                        <h2 class="heading">Achievements</h2>
+                        <div class="content">
+                            {% for ach in data['achievements'] %}
+                            <i class="fa fa-trophy"></i>
+                            <a href="{{ach.achievement_url}}">{{ach.achievement_title}}</a>
+                            <br>
+                            {{ach.achievement_description}}<br>
+                            {% if ach.achievement_date != "None" %}
+                            <span class="year">Achievement Date</span>
+                            <br>
+                            {% endif %}
+                            {% endfor %}
+                            <p><a class="more-link" href="{{ data['social']['linkedin_url'] }}"><i
+                                        class="fas fa-external-link-alt"></i></a>More on Linkedin</p>
+                        </div>
+                    </div>
+                </aside>
+                {% endif %}
+
+                <aside class="languages aside section">
+                    <div class="section-inner">
+                        <h2 class="heading">Languages</h2>
+                        <div class="content">
+                            {% for skill in data['langs'] %}
+                            <div class="item">
+                                <span class="title"><strong>{{skill.name}}:</strong></span>
+                                <span class="level">{{skill.level}}</span>
+                                {% if skill.level == 'Native Speaker' %}
+                                <br class="visible-xs" />
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                {% endif %}
+                                {% if skill.level == 'Second Language'%}
+                                <br class="visible-xs" />
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                {% endif %}
+                                {% if skill.level == 'Third Language'%}
+                                <br class="visible-xs" />
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                {% endif %}
+                            </div><!--//item-->
+                            {% endfor %}
+                        </div><!--//content-->
+                    </div><!--//section-inner-->
+                </aside><!--//section-->
+            </div><!--//secondary-->
+        </div><!--//row-->
+    </div><!--//masonry-->
+
+    <!-- Javascript -->
+    <script type="text/javascript" src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+    <script type="text/javascript"
+        src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+    <!-- custom js -->
+    <script type="text/javascript">
+        $(window).on('load', function () {
+            $('.level-bar-inner').each(function () {
+                var itemWidth = $(this).data('level');
+                $(this).animate({
+                    width: itemWidth
+                }, 800);
+            });
+        });
+    </script>
+</body>
+
+</html>

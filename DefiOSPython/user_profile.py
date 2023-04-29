@@ -82,16 +82,3 @@ def update_user_progress(token, progress_type, progress_title):
         message = {"error": "ProgressUpdateFailed"}
         status_code = 400
     return make_response(jsonify(message), status_code)
-
-
-def generate_portfolio_website(token, template_type):
-    isAuthorized, resp = validate_user(token)
-    if not isAuthorized:
-        return resp
-    try:
-        message = {"link": "https://portfolios.defi-os.com/never2average"}
-        status_code = 200
-    except:
-        message = {"error": "ProfileURLCreationFailed"}
-        status_code = 400
-    return make_response(jsonify(message), status_code)
