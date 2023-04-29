@@ -55,10 +55,11 @@ def generate_portfolio_website(token, template_type):
     if not isAuthorized:
         return resp
     try:
-        message = {"link": "https://userportfolios.s3.ap-south-1.amazonaws.com/tanmaymunjal64-gmail-com.html"}
+        message = {
+            "link": "https://userportfolios.s3.ap-south-1.amazonaws.com/tanmaymunjal64-gmail-com.html"
+        }
         status_code = 200
     except:
         message = {"error": "ProfileURLCreationFailed"}
         status_code = 400
     return make_response(jsonify(message), status_code)
-
