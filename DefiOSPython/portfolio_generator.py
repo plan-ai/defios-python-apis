@@ -13,10 +13,7 @@ bucketName = config["AWS"]["BUCKETNAME"]
 cdn = config["AWS"]["CDN"]
 
 
-def lambda_handler(event):
-    # request data sent by users
-    requestData = event["body"]["data"]
-
+def generate_website(requestData):
     # converts educational credentials sent into markup langauge for templating
     for i in requestData["education"]:
         i["summary"] = markupsafe.Markup(i["summary"])
@@ -39,15 +36,7 @@ def lambda_handler(event):
     # sends in cloudfront link of generated portfolio
     web_page_url = "https://{}.s3.ap-south-1.amazonaws.com/{}".format(bucketName, key)
 
-    # api response
-    response = {
-        "statusCode": 200,
-        "body": json.dumps(
-            {"message": "Successfully Generated CV!", "url": web_page_url}
-        ),
-    }
-
-    return response
+    return web_page_url
 
 
 def generate_portfolio_website(token, template_type):
@@ -55,9 +44,13 @@ def generate_portfolio_website(token, template_type):
     if not isAuthorized:
         return resp
     try:
-        message = {
-            "link": "https://userportfolios.s3.ap-south-1.amazonaws.com/tanmaymunjal64-gmail-com.html"
+        requestData = {
+            "profile_pic_url": resp.user_profile_pic,
+            "profile_name": resp.user_gh_name,
+            "social": {"github_url": resp.user_github},
+            "template_no": template_type,
         }
+        message = {"link": generate_website(requestData)}
         status_code = 200
     except:
         message = {"error": "ProfileURLCreationFailed"}
