@@ -5,10 +5,11 @@ from bson.objectid import ObjectId
 from utils import remove_dups_by_id
 import json
 
+
 def fetch_projects(token, request_params):
     """
     Used to push a firebase notif to the web frontend
-    
+
     Parameters
     --------------------
     token:string
@@ -27,29 +28,29 @@ def fetch_projects(token, request_params):
         return resp
 
     # try:
-    start_id = request_params.get("first_id", None)  
+    start_id = request_params.get("first_id", None)
     filter_params = {
         i.split(".")[1]: request_params[i]
-        for i in request_params if "filter" in i and request_params[i] != ""
+        for i in request_params
+        if "filter" in i and request_params[i] != ""
     }
     search_params = {
         i.split(".")[1]: request_params[i]
-        for i in request_params if "search" in i and request_params[i] != ""
+        for i in request_params
+        if "search" in i and request_params[i] != ""
     }
     for i in search_params:
         if search_params[i] in ["false", "true"]:
-            search_params[i] = {"$eq":json.loads(search_params[i])}
+            search_params[i] = {"$eq": json.loads(search_params[i])}
         elif "," in search_params[i]:
             search_params[i] = {"$in": search_params[i].split(",")}
         elif search_params[i].isdigit() and i != "project_owner_github":
             search_params[i] = {"$gt": int(search_params[i])}
         elif i == "project_owner_github":
-            search_params[i] = {
-                "$eq": search_params[i]
-            }
+            search_params[i] = {"$eq": search_params[i]}
         else:
             search_params[i] = {"$regex": search_params[i]}
-    
+
     for i in filter_params:
         if filter_params[i] in ["false", "true"]:
             filter_params[i] = json.loads(filter_params[i])
@@ -62,25 +63,20 @@ def fetch_projects(token, request_params):
     if not filter_params.get("order_by", False):
         filter_params["order_by"] = "-num_open_issues"
 
-
-    projects = Projects.objects(
-        __raw__=search_params
-    ).order_by(
-        filter_params["order_by"]
-    ).skip(
-        (filter_params.get("pageno",1)-1)*filter_params["pagesize"]
-    ).limit(filter_params["pagesize"]).all()
+    projects = (
+        Projects.objects(__raw__=search_params)
+        .order_by(filter_params["order_by"])
+        .skip((filter_params.get("pageno", 1) - 1) * filter_params["pagesize"])
+        .limit(filter_params["pagesize"])
+        .all()
+    )
 
     cleaned_projects = [i.parse_to_json() for i in projects]
 
-    message = {
-        "projects": cleaned_projects
-    }
+    message = {"projects": cleaned_projects}
 
     if start_id is not None:
-        start_project = Projects.objects(
-            id=ObjectId(start_id)
-        ).first().parse_to_json()
+        start_project = Projects.objects(id=ObjectId(start_id)).first().parse_to_json()
         message["projects"].insert(0, start_project)
         message["projects"] = remove_dups_by_id(message["projects"])
 
@@ -89,12 +85,12 @@ def fetch_projects(token, request_params):
     #     message = {"error": "ProjectsFetchFailed"}
     #     status_code = 400
     return make_response(jsonify(message), status_code)
-    
+
 
 def fetch_projects_minified(token):
     """
     Used to fetch projects in a minified fashion
-    
+
     Parameters
     --------------------
     token:string
@@ -115,16 +111,22 @@ def fetch_projects_minified(token):
     if not isAuthorized:
         return resp
     try:
-        projects = Projects.objects.only("project_name", "project_token", "project_repo_link", "project_account").all()
+        projects = Projects.objects.only(
+            "project_name", "project_token", "project_repo_link", "project_account"
+        ).all()
         message = []
         for project in projects:
-            message.append({
-                "project_name": project.project_name,
-                "token_url": project.project_token.token_image_url,
-                "id": str(project.id),
-                "account": project.project_account,
-                "project_url": "https://github.com/defi-os/defios-alpha" if project.project_repo_link == "" else project.project_repo_link
-            })
+            message.append(
+                {
+                    "project_name": project.project_name,
+                    "token_url": project.project_token.token_image_url,
+                    "id": str(project.id),
+                    "account": project.project_account,
+                    "project_url": "https://github.com/defi-os/defios-alpha"
+                    if project.project_repo_link == ""
+                    else project.project_repo_link,
+                }
+            )
         status_code = 200
     except Exception:
         message = {"error": "Project Fetch Failed"}

@@ -6,7 +6,7 @@ from flask import make_response, jsonify
 def profile_contributions(token):
     """
     Used to fetch a users profile contributions
-    
+
     Parameters
     --------------------
     token:string
@@ -44,15 +44,15 @@ def profile_contributions(token):
 def update_user_progress(token, progress_type, progress_title):
     """
     Used to update a users progress status
-    
+
     Parameters
     --------------------
     token:string
                   Unique jwt identifier of the user to authenticate notif request, all users are set to admin for this demonstration
     progress_type: string
-                      Type of progress in walkthrough(developer,enterprise,maintainer) 
-    progress_title: string 
-                      Title of progression step in walkthrough passed                
+                      Type of progress in walkthrough(developer,enterprise,maintainer)
+    progress_title: string
+                      Title of progression step in walkthrough passed
 
     Returns
     --------------------
@@ -66,11 +66,14 @@ def update_user_progress(token, progress_type, progress_title):
         progress_master = resp.user_progress
         n = len(progress_master)
         for i in range(n):
-            if progress_master[i].progress_type == progress_type and progress_master[i].progress_title == progress_title:
+            if (
+                progress_master[i].progress_type == progress_type
+                and progress_master[i].progress_title == progress_title
+            ):
                 progress_master[i] = ProgressItem(
                     progress_type=progress_type,
                     progress_master=progress_master,
-                    progress_true=True
+                    progress_true=True,
                 )
         resp.update(set__user_progress=progress_master)
         message = {"message": "ProgressUpdateSuccessful"}

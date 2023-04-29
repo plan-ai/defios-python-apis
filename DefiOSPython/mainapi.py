@@ -20,38 +20,27 @@ mongoengine.connect("DefiOS")
 
 class Notifications(Resource):
     def get(self):
-        return fetch_notifications(
-            request.headers.get("Authorization")
-        )
+        return fetch_notifications(request.headers.get("Authorization"))
+
     def post(self):
         return post_notifications(
-            request.headers.get("Authorization"),
-            request.get_json()
+            request.headers.get("Authorization"), request.get_json()
         )
 
 
 class Projects(Resource):
     def get(self):
-        return fetch_projects(
-            request.headers.get("Authorization"),
-            request.args
-        )
+        return fetch_projects(request.headers.get("Authorization"), request.args)
 
 
 class Issues(Resource):
     def get(self):
-        return fetch_issues(
-            request.headers.get("Authorization"),
-            request.args
-        )
+        return fetch_issues(request.headers.get("Authorization"), request.args)
 
 
 class Roadmaps(Resource):
     def get(self):
-        return get_roadmaps(
-            request.headers.get("Authorization"),
-            request.args
-        )
+        return get_roadmaps(request.headers.get("Authorization"), request.args)
 
 
 class RoadmapObjectives(Resource):
@@ -61,24 +50,20 @@ class RoadmapObjectives(Resource):
 class NotificationsRead(Resource):
     def post(self):
         return mark_notifs_as_read(
-            request.headers.get("Authorization"),
-            request.args.get("reset")
+            request.headers.get("Authorization"), request.args.get("reset")
         )
 
 
 class TokenDetails(Resource):
     def get(self):
         return fetch_token_details(
-            request.headers.get("Authorization"),
-            request.args.get("token_symbol")
+            request.headers.get("Authorization"), request.args.get("token_symbol")
         )
 
 
 class ListTokens(Resource):
     def get(self):
-        return fetch_token_list(
-            request.headers.get("Authorization")
-        )
+        return fetch_token_list(request.headers.get("Authorization"))
 
 
 class FetchJWT(Resource):
@@ -88,35 +73,30 @@ class FetchJWT(Resource):
             body.get("github_id"),
             body.get("firebase_uid"),
             body.get("user_gh_access_token"),
-            body.get("pub_key")
+            body.get("pub_key"),
         )
 
 
 class SanityCheck(Resource):
     def get(self):
-        return make_response(jsonify({"Status":"API is reachable"}), 200)
+        return make_response(jsonify({"Status": "API is reachable"}), 200)
 
 
 class ProfileContributions(Resource):
     def get(self):
-        return profile_contributions(
-            request.headers.get("Authorization")
-        )
+        return profile_contributions(request.headers.get("Authorization"))
 
 
 class PortfolioGenerator(Resource):
     def post(self):
         return generate_portfolio_website(
-            request.headers.get("Authorization"),
-            request.args.get("website_type")
+            request.headers.get("Authorization"), request.args.get("website_type")
         )
-    
+
 
 class HomepageAPI(Resource):
     def get(self):
-        return fetch_homepage(
-            request.headers.get("Authorization")
-        )
+        return fetch_homepage(request.headers.get("Authorization"))
 
 
 class UpdateProgress(Resource):
@@ -124,23 +104,18 @@ class UpdateProgress(Resource):
         return update_user_progress(
             request.headers.get("Authorization"),
             request.args.get("progress_type"),
-            request.args.get("progress_title")
+            request.args.get("progress_title"),
         )
 
 
 class ProjectsMinified(Resource):
     def get(self):
-        return fetch_projects_minified(
-            request.headers.get("Authorization")
-        )
+        return fetch_projects_minified(request.headers.get("Authorization"))
 
 
 class JobsPreSignups(Resource):
     def post(self):
-        return add_to_waitlist(
-            request.args.get("email"),
-            request.args.get("wl_type")
-        )
+        return add_to_waitlist(request.args.get("email"), request.args.get("wl_type"))
 
 
 api.add_resource(Notifications, "/notifications")
@@ -161,4 +136,4 @@ api.add_resource(UpdateProgress, "/progress/new")
 api.add_resource(JobsPreSignups, "/waitlist/jobs")
 
 if __name__ == "__main__":
-    app.run(host='0.0.0.0', port=8001, debug=True)
+    app.run(host="0.0.0.0", port=8001, debug=True)

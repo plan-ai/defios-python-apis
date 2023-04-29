@@ -5,10 +5,11 @@ from bson.objectid import ObjectId
 import json
 from utils import isfloat, remove_dups_by_id
 
+
 def fetch_issues(token, request_params):
     """
     Used to fetch issues given one or more set of filters
-    
+
     Parameters
     --------------------
     token:string
@@ -34,27 +35,29 @@ def fetch_issues(token, request_params):
     --------------------
     issues -> List[Issues]:
             Return list of Issue model raw json of the flitered issues
-    
+
     """
     isAuthorized, resp = validate_user(token)
     if not isAuthorized:
         return resp
-    
+
     try:
-        start_id = request_params.get("first_id", None)    
+        start_id = request_params.get("first_id", None)
 
         filter_params = {
             i.split(".")[1]: request_params[i]
-            for i in request_params if "filter" in i and request_params[i] != ""
+            for i in request_params
+            if "filter" in i and request_params[i] != ""
         }
         search_params = {
             i.split(".")[1]: request_params[i]
-            for i in request_params if "search" in i and request_params[i] != ""
+            for i in request_params
+            if "search" in i and request_params[i] != ""
         }
 
         for i in search_params:
             if search_params[i] in ["false", "true"]:
-                search_params[i] = {"$eq":json.loads(search_params[i])}
+                search_params[i] = {"$eq": json.loads(search_params[i])}
             elif i == "issue_creator_gh":
                 search_params[i] = {"$eq": search_params[i]}
             elif search_params[i].isdigit() and i != "issue_creator_gh":
@@ -78,32 +81,27 @@ def fetch_issues(token, request_params):
         if not filter_params.get("order_by", False):
             filter_params["order_by"] = "-issue_stake_amount"
 
-
-        issues = Issues.objects(
-            __raw__=search_params
-        ).order_by(
-            filter_params["order_by"]
-        ).skip(
-            (filter_params["pageno"]-1)*filter_params["pagesize"]
-        ).limit(filter_params["pagesize"]).all()
+        issues = (
+            Issues.objects(__raw__=search_params)
+            .order_by(filter_params["order_by"])
+            .skip((filter_params["pageno"] - 1) * filter_params["pagesize"])
+            .limit(filter_params["pagesize"])
+            .all()
+        )
 
         cleaned_issues = [i.parse_to_json() for i in issues]
 
-        message = {
-            "issues": cleaned_issues
-        }
-        
+        message = {"issues": cleaned_issues}
+
         if start_id is not None:
             start_issue = Issues.objects(id=ObjectId(start_id)).first().parse_to_json()
             message["issues"].insert(0, start_issue)
-            message = {
-                "issues": remove_dups_by_id(message["issues"])
-            }
+            message = {"issues": remove_dups_by_id(message["issues"])}
 
         status_code = 200
-    
+
     except Exception:
         message = {"error": "IssueFetchError"}
         status_code = 400
-    
+
     return make_response(jsonify(message), status_code)

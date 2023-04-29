@@ -9,7 +9,7 @@ import firebase_admin
 def fetch_notifications(token):
     """
     Used to fetch unread notifs of a user
-    
+
     Parameters
     --------------------
     token:string
@@ -25,8 +25,7 @@ def fetch_notifications(token):
         return resp
     try:
         notifications = Notifications.objects(
-            reciever=resp.user_github,
-            notif_read_status=False
+            reciever=resp.user_github, notif_read_status=False
         ).all()
         message = [i.to_mongo().to_dict() for i in notifications]
         for i in message:
@@ -41,7 +40,7 @@ def fetch_notifications(token):
 def mark_notifs_as_read(token, reset=False):
     """
     Used to mark a notif as read or reset to False
-    
+
     Parameters
     --------------------
     token:string
@@ -86,9 +85,11 @@ def post_notifications(token, notif_json):
                 "/home/ubuntu/defios-api/defios_firebase.json"
             )
             firebase_app = firebase_admin.initialize_app(firebase_creds)
-        user = Users.objects(
-            user_github=notif_json["user_github"]
-        ).only("user_fb_uid").first()
+        user = (
+            Users.objects(user_github=notif_json["user_github"])
+            .only("user_fb_uid")
+            .first()
+        )
         notif = Notifications(
             reciever=notif_json["user_github"],
             sender_id=resp.user_github,
@@ -99,7 +100,7 @@ def post_notifications(token, notif_json):
             notif_content=notif_json["notif_content"],
             notif_action_path=notif_json["notif_action_path"],
             notif_action_state_params=notif_json["notif_state"],
-            notif_action_api_params=notif_json["notif_api_specs"]
+            notif_action_api_params=notif_json["notif_api_specs"],
         )
         fb_notif = firebase_push_notifications.Message(
             token=user.user_fb_uid,
@@ -108,17 +109,15 @@ def post_notifications(token, notif_json):
             ),
             webpush=firebase_push_notifications.WebpushConfig(
                 notification=firebase_push_notifications.WebpushNotification(
-                    title="New Notification", body=notif_json["notif_content"],
-                    icon=resp.user_profile_pic
+                    title="New Notification",
+                    body=notif_json["notif_content"],
+                    icon=resp.user_profile_pic,
                 )
-            )
+            ),
         )
         notif.save()
         response = firebase_push_notifications.send(fb_notif)
-        message = {
-            "message": "NotificationPostSuccess",
-            "notif_id": response
-        }
+        message = {"message": "NotificationPostSuccess", "notif_id": response}
         status_code = 200
     except Exception:
         message = {"error": "NotificationPostFailed"}
