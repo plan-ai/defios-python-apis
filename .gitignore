@@ -161,3 +161,6 @@ cython_debug/
 
 #config files
 *.ini
+
+#firebase config files
+defios_firebase.json
