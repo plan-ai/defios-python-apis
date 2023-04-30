@@ -9,7 +9,7 @@ from datetime import datetime
 class Token(Document):
     token_name = StringField()
     token_spl_addr = StringField()
-    token_symbol = StringField(required=True, unique=True)
+    token_symbol = StringField()
     token_image_url = URLField()
     token_price_feed = URLField()
     token_ltp = FloatField()
@@ -27,12 +27,16 @@ class RoadmapObjective(EmbeddedDocument):
     objective_creation_date = DateTimeField()
     objective_creator_gh_name = StringField()
     objective_creator_gh_profile_pic = URLField()
-    objective_deliverable =  StringField(choices=["Infrastructure","Tooling", "Publication", "Product", "Other"])
-    objective_state = StringField(choices=["Locked", "InProgress", "Closed", "Deprecated"])
+    objective_deliverable = StringField(
+        choices=["Infrastructure", "Tooling", "Publication", "Product", "Other"]
+    )
+    objective_state = StringField(
+        choices=["Locked", "InProgress", "Closed", "Deprecated"]
+    )
     objective_start_date = DateTimeField()
     objective_end_date = DateTimeField()
- 
-    
+
+
 class Roadmap(Document):
     roadmap_creator_gh = StringField()
     roadmap_creator_gh_profile_url = URLField()
@@ -41,23 +45,30 @@ class Roadmap(Document):
     roadmap_total_stake = FloatField()
     roadmap_active_objectives = IntField()
     roadmap_outcome_types = ListField(
-        StringField(choices=["Infrastructure","Tooling", "Publication", "Product", "Other"])
+        StringField(
+            choices=["Infrastructure", "Tooling", "Publication", "Product", "Other"]
+        )
     )
     roadmap_objectives_list = EmbeddedDocumentListField(RoadmapObjective)
     roadmap_objectives_graph = DictField()
     roadmap_creation_date = DateTimeField()
     roadmap_title = StringField()
     roadmap_outlook = StringField(
-        required=True, default="Next 2 Yrs",
-        choices=["Next 2 Yrs", "Long-Term Public Good", "Next 5 Yrs", "More than 5 Yrs"]
+        required=True,
+        default="Next 2 Yrs",
+        choices=[
+            "Next 2 Yrs",
+            "Long-Term Public Good",
+            "Next 5 Yrs",
+            "More than 5 Yrs",
+        ],
     )
 
     def to_roadmap_json(self):
         return {
             "title": self.roadmap_title,
             "creation_date": datetime.strftime(
-                self.roadmap_creation_date,
-                "%Y-%m-%dT%H:%M:%s"
+                self.roadmap_creation_date, "%Y-%m-%dT%H:%M:%s"
             ),
             "creator": self.roadmap_creator_gh,
             "creator_profile_pic": self.roadmap_creator_gh_profile_url,
@@ -65,7 +76,7 @@ class Roadmap(Document):
             "total_stake": self.roadmap_total_stake,
             "cover_image": self.roadmap_cover_img_url,
             "active_objectives": self.roadmap_active_objectives,
-            "outcomes": list(set(self.roadmap_outcome_types))
+            "outcomes": list(set(self.roadmap_outcome_types)),
         }
 
 
@@ -82,7 +93,9 @@ class Contributions(EmbeddedDocument):
 
 
 class ProgressItem(EmbeddedDocument):
-    progress_type = StringField(required=True, choices=["developer", "maintainer", "enterprise"])
+    progress_type = StringField(
+        required=True, choices=["developer", "maintainer", "enterprise"]
+    )
     progress_text = StringField(required=True)
     progress_true = BooleanField(required=True, default=False)
 
@@ -99,13 +112,19 @@ class Users(Document):
     def fetch_contributions(self):
         contributions = self.to_mongo().to_dict()["user_contributions"]
         contributors = [i["contributor_github"] for i in contributions]
-        contributors_data = Users.objects(user_github__in=contributors).only("user_github", "user_gh_name", "user_profile_pic")
-        contributors_data = {i.user_github:i for i in contributors_data}
+        contributors_data = Users.objects(user_github__in=contributors).only(
+            "user_github", "user_gh_name", "user_profile_pic"
+        )
+        contributors_data = {i.user_github: i for i in contributors_data}
 
         for contribution in contributions:
-            contribution["contributor_name"] = contributors_data[contribution["contributor_github"]].user_gh_name
-            contribution["contributor_profile_pic"] = contributors_data[contribution["contributor_github"]].user_profile_pic
-        
+            contribution["contributor_name"] = contributors_data[
+                contribution["contributor_github"]
+            ].user_gh_name
+            contribution["contributor_profile_pic"] = contributors_data[
+                contribution["contributor_github"]
+            ].user_profile_pic
+
         return contributions
 
 
@@ -161,13 +180,18 @@ class Projects(Document):
     internal_tags = DynamicField()
     coins_staked = FloatField()
     coins_rewarded = FloatField()
+    claimers_pending = ListField(StringField())
 
-    def parse_to_json(self):
+    def parse_to_json(self, github_id=""):
         project_json = self.to_mongo().to_dict()
         project_json["_id"] = str(project_json["_id"])
-        project_json["project_token"] = Token.objects(
-            id=project_json["project_token"]
-        ).first().to_mongo().to_dict()
+        project_json["project_token"] = (
+            Token.objects(id=project_json["project_token"]).first().to_mongo().to_dict()
+        )
+        if github_id in project_json["claimers_pending"]:
+            project_json["claimable"] = True
+        else:
+            project_json["claimable"] = False
         project_json["coins_staked"] = 100.1
         project_json["coins_rewarded"] = 100.1
         del project_json["project_token"]["_id"]

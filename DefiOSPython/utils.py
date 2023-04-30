@@ -1,12 +1,14 @@
 from collections import defaultdict
 
+
 def isfloat(num):
     try:
         float(num)
         return True
     except ValueError:
         return False
-    
+
+
 def remove_dups_by_id(obj_array):
     new_obj_array = []
     key_exists = defaultdict(int)

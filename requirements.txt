@@ -1,4 +1,7 @@
 aniso8601==9.0.1
+black==23.3.0
+boto3==1.26.123
+botocore==1.29.123
 CacheControl==0.12.11
 cachetools==5.3.0
 certifi==2022.12.7
@@ -28,9 +31,14 @@ httplib2==0.21.0
 idna==3.4
 itsdangerous==2.1.2
 Jinja2==3.1.2
+jmespath==1.0.1
 MarkupSafe==2.1.2
 mongoengine==0.26.0
 msgpack==1.0.4
+mypy-extensions==1.0.0
+packaging==23.1
+pathspec==0.11.1
+platformdirs==3.5.0
 proto-plus==1.22.2
 protobuf==4.22.0
 pyasn1==0.4.8
@@ -39,10 +47,13 @@ pycparser==2.21
 PyJWT==2.6.0
 pymongo==4.3.3
 pyparsing==3.0.9
+python-dateutil==2.8.2
 pytz==2022.7.1
 requests==2.28.2
 rsa==4.9
+s3transfer==0.6.0
 six==1.16.0
+tomli==2.0.1
 uritemplate==4.1.1
 urllib3==1.26.14
 Werkzeug==2.2.3
