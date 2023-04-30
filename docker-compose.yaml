@@ -1,0 +1,6 @@
+version: "0.1"
+services:
+  api:
+    build: .
+    ports:
+      - "5000:443"
