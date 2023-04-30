@@ -2,9 +2,9 @@ name: Basic deploy
 
 on:
   push:
-    branches: [ main ]
+    branches: [ master ]
   pull:
-    branches: [ main ]
+    branches: [ master ]
 
 jobs:
   EC2-Deploy:
