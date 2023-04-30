@@ -1,7 +1,7 @@
 name: Basic deploy
 
 on:
-  [push,workflow_dispatch]:
+  push:
     branches: [ master ]
 
 jobs:
