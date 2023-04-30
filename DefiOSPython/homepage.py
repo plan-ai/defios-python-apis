@@ -65,11 +65,14 @@ def fetch_homepage(token):
 
         message["paths"] = fetch_progress_json(resp.user_progress)
 
-        message["projects"] = (
-            Projects.objects.order_by("-community_health", "-num_open_issues")
-            .first()
-            .parse_to_json()
-        )
+        try:
+            message["projects"] = (
+                Projects.objects.order_by("-community_health", "-num_open_issues")
+                .first()
+                .parse_to_json(resp.user_github)
+            )
+        except:
+            message["projects"] = {}
 
         status_code = 200
     except:

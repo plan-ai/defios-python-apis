@@ -9,7 +9,7 @@ from datetime import datetime
 class Token(Document):
     token_name = StringField()
     token_spl_addr = StringField()
-    token_symbol = StringField(required=True, unique=True)
+    token_symbol = StringField()
     token_image_url = URLField()
     token_price_feed = URLField()
     token_ltp = FloatField()
@@ -180,13 +180,18 @@ class Projects(Document):
     internal_tags = DynamicField()
     coins_staked = FloatField()
     coins_rewarded = FloatField()
+    claimers_pending = ListField(StringField())
 
-    def parse_to_json(self):
+    def parse_to_json(self, github_id=""):
         project_json = self.to_mongo().to_dict()
         project_json["_id"] = str(project_json["_id"])
         project_json["project_token"] = (
             Token.objects(id=project_json["project_token"]).first().to_mongo().to_dict()
         )
+        if github_id in project_json["claimers_pending"]:
+            project_json["claimable"] = True
+        else:
+            project_json["claimable"] = False
         project_json["coins_staked"] = 100.1
         project_json["coins_rewarded"] = 100.1
         del project_json["project_token"]["_id"]

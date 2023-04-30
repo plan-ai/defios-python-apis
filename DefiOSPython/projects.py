@@ -27,63 +27,88 @@ def fetch_projects(token, request_params):
     if not isAuthorized:
         return resp
 
-    # try:
-    start_id = request_params.get("first_id", None)
-    filter_params = {
-        i.split(".")[1]: request_params[i]
-        for i in request_params
-        if "filter" in i and request_params[i] != ""
-    }
-    search_params = {
-        i.split(".")[1]: request_params[i]
-        for i in request_params
-        if "search" in i and request_params[i] != ""
-    }
-    for i in search_params:
-        if search_params[i] in ["false", "true"]:
-            search_params[i] = {"$eq": json.loads(search_params[i])}
-        elif "," in search_params[i]:
-            search_params[i] = {"$in": search_params[i].split(",")}
-        elif search_params[i].isdigit() and i != "project_owner_github":
-            search_params[i] = {"$gt": int(search_params[i])}
-        elif i == "project_owner_github":
-            search_params[i] = {"$eq": search_params[i]}
-        else:
-            search_params[i] = {"$regex": search_params[i]}
+    try:
+        start_id = request_params.get("first_id", None)
+        filter_params = {
+            i.split(".")[1]: request_params[i]
+            for i in request_params
+            if "filter" in i and request_params[i] != ""
+        }
+        search_params = {
+            i.split(".")[1]: request_params[i]
+            for i in request_params
+            if "search" in i and request_params[i] != ""
+        }
+        for i in search_params:
+            if search_params[i] in ["false", "true"]:
+                search_params[i] = {"$eq": json.loads(search_params[i])}
+            elif "," in search_params[i]:
+                search_params[i] = {"$in": search_params[i].split(",")}
+            elif search_params[i].isdigit() and i != "project_owner_github":
+                search_params[i] = {"$gt": int(search_params[i])}
+            elif i == "project_owner_github":
+                search_params[i] = {"$eq": search_params[i]}
+            else:
+                search_params[i] = {"$regex": search_params[i]}
 
-    for i in filter_params:
-        if filter_params[i] in ["false", "true"]:
-            filter_params[i] = json.loads(filter_params[i])
-        elif filter_params[i].isdigit():
-            filter_params[i] = int(filter_params[i])
+        for i in filter_params:
+            if filter_params[i] in ["false", "true"]:
+                filter_params[i] = json.loads(filter_params[i])
+            elif filter_params[i].isdigit():
+                filter_params[i] = int(filter_params[i])
 
-    if filter_params.get("mine", False):
-        search_params["project_owner_github"] = resp.user_github
+        if filter_params.get("mine", False):
+            search_params["project_owner_github"] = resp.user_github
 
-    if not filter_params.get("order_by", False):
-        filter_params["order_by"] = "-num_open_issues"
+        if not filter_params.get("order_by", False):
+            filter_params["order_by"] = "-num_open_issues"
 
-    projects = (
-        Projects.objects(__raw__=search_params)
-        .order_by(filter_params["order_by"])
-        .skip((filter_params.get("pageno", 1) - 1) * filter_params["pagesize"])
-        .limit(filter_params["pagesize"])
-        .all()
-    )
+        projects = (
+            Projects.objects(__raw__=search_params)
+            .order_by(filter_params["order_by"])
+            .skip((filter_params.get("pageno", 1) - 1) * filter_params["pagesize"])
+            .limit(filter_params["pagesize"])
+            .all()
+        )
 
-    cleaned_projects = [i.parse_to_json() for i in projects]
+        cleaned_projects = [i.parse_to_json(resp.user_github) for i in projects]
 
-    message = {"projects": cleaned_projects}
+        message = {"projects": cleaned_projects}
 
-    if start_id is not None:
-        start_project = Projects.objects(id=ObjectId(start_id)).first().parse_to_json()
-        message["projects"].insert(0, start_project)
-        message["projects"] = remove_dups_by_id(message["projects"])
+        if start_id is not None:
+            start_project = (
+                Projects.objects(id=ObjectId(start_id))
+                .first()
+                .parse_to_json(resp.user_github)
+            )
+            message["projects"].insert(0, start_project)
+            message["projects"] = remove_dups_by_id(message["projects"])
 
-    status_code = 200
-    # except:
-    #     message = {"error": "ProjectsFetchFailed"}
-    #     status_code = 400
+        status_code = 200
+    except:
+        message = {"error": "ProjectsFetchFailed"}
+        status_code = 400
+    return make_response(jsonify(message), status_code)
+
+
+def mark_tokens_as_claimed(token, project_id):
+    isAuthorized, resp = validate_user(token)
+    if not isAuthorized:
+        return resp
+
+    try:
+        project = Projects.objects(id=ObjectId(project_id)).first()
+        project.update(
+            set__claimers_pending=[
+                i for i in project.claimers_pending if i != resp.user_github
+            ]
+        )
+        message = {"message": "ClaimMarkingSuccessful"}
+        status_code = 200
+
+    except:
+        message = {"error": "ClaimMarkingFailed"}
+        status_code = 400
     return make_response(jsonify(message), status_code)
 
 

@@ -111,7 +111,7 @@ def generate_jwt(github_uid, firebase_uid, gh_access_token, pub_key):
             user.update(set__user_fb_uid=firebase_uid)
         token = jwt.encode(
             {"github": github_uid, "firebase": firebase_uid},
-            "SOME_JWT_SECRET",
+            "efgiul211uif13r321342fhruedslrih3lfch3ruic3re",
             "HS256",
         )
         message = {"auth_creds": token, "firebase": firebase_uid}
@@ -127,7 +127,9 @@ def validate_user(token):
         jsonify({"message": "Invalid or Expired User token"}), 401
     )
     try:
-        github_uid = jwt.decode(token, "SOME_JWT_SECRET", ["HS256"])["github"]
+        github_uid = jwt.decode(
+            token, "efgiul211uif13r321342fhruedslrih3lfch3ruic3re", ["HS256"]
+        )["github"]
         user = Users.objects(user_github=github_uid).first()
         if user is not None:
             return True, user
