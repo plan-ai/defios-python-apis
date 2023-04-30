@@ -1,6 +1,8 @@
 
 # Contributor's Guide
 
+NOTE CI/CD Pipeline is not currently functional due to some error in bitops pipeline, work on creating custom terrafom pipeline is running
+
 ## Setting the project in your local
 
 ### Initial Steps
