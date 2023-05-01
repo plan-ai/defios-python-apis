@@ -1,4 +1,4 @@
-from models import ProgressItem, Users
+from DefiOSPython.models import ProgressItem, Users
 import mongoengine
 
 mongoengine.connect("DefiOS")

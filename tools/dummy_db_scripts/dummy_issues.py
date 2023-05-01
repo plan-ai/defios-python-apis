@@ -1,6 +1,5 @@
 import mongoengine
-from models import Token, Issues, IssuePRs
-from mongoengine import ReferenceField
+from DefiOSPython.models import Token, Issues, IssuePRs
 import random
 
 mongoengine.connect("DefiOS")

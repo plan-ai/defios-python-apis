@@ -1,4 +1,4 @@
-from models import Contributions, Users, Projects, Token
+from DefiOSPython.models import Contributions, Users, Projects, Token
 import random
 from datetime import datetime, timedelta
 import mongoengine
