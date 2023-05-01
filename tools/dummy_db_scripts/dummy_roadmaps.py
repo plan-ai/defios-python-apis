@@ -1,10 +1,9 @@
 import mongoengine
-
-mongoengine.connect("DefiOS")
-from models import Roadmap, Users
+from DefiOSPython.models import Roadmap, Users
 import random
 from datetime import datetime, timedelta
 
+mongoengine.connect("DefiOS")
 users = Users.objects.all()
 
 roadmap_creator_gh_list = [
