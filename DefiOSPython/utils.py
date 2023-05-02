@@ -5,7 +5,7 @@ def isfloat(num):
     try:
         float(num)
         return True
-    except ValueError:
+    except:
         return False
 
 
