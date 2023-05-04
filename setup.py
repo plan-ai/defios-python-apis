@@ -25,6 +25,7 @@ setup(
     description="Python Flask API for defi-os",
     long_description=read("DefiOSPython/README.md"),
     packages=find_packages(exclude=('templates','tools',)),
+    python_requires='>=3.7',
     install_requires=required,
     classifiers=[
         'Natural Language :: English',
