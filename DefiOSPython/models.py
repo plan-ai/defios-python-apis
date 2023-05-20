@@ -7,52 +7,53 @@ from datetime import datetime
 
 
 class Token(Document):
-    token_name = StringField()
-    token_spl_addr = StringField()
-    token_symbol = StringField()
-    token_image_url = URLField()
+    token_name = StringField(required=True)
+    token_spl_address = StringField(required=True)
+    token_symbol = StringField(required=True)
+    token_image_url = URLField(required=True)
     token_price_feed = URLField()
     token_ltp = FloatField()
     token_ltp_24h_change = FloatField()
-    token_total_supply = IntField()
+    token_total_supply = IntField(required=True)
     token_circulating_supply = IntField()
-    token_creator_name = StringField()
-    token_creation_date = DateTimeField()
-    token_repository_link = URLField()
+    token_creator_name = StringField(required=True)
+    token_creation_date = DateTimeField(required=True)
+    token_repository_link = URLField(required=True)
     meta = {"collection": "tokens"}
 
 
 class RoadmapObjective(EmbeddedDocument):
     objective_title = StringField(required=True)
-    objective_creation_date = DateTimeField()
-    objective_creator_gh_name = StringField()
-    objective_creator_gh_profile_pic = URLField()
+    objective_creation_date = DateTimeField(required=True)
+    objective_creator_gh_name = StringField(required=True)
+    objective_creator_gh_profile_pic = URLField(required=True)
     objective_deliverable = StringField(
-        choices=["Infrastructure", "Tooling", "Publication", "Product", "Other"]
+        choices=["Infrastructure", "Tooling", "Publication", "Product", "Other"],required=True
     )
     objective_state = StringField(
-        choices=["Locked", "InProgress", "Closed", "Deprecated"]
+        choices=["Locked", "InProgress", "Closed", "Deprecated"],required=True
     )
-    objective_start_date = DateTimeField()
+    objective_start_date = DateTimeField(required=True)
     objective_end_date = DateTimeField()
-
+    objective_issue = ReferenceField(Issues,required=True)
+    objective_address = StringField(required=True)
 
 class Roadmap(Document):
-    roadmap_creator_gh = StringField()
-    roadmap_creator_gh_profile_url = URLField()
-    roadmap_creator_gh_name = StringField(required=True, default="")
+    roadmap_creator_gh = StringField(required=True)
+    roadmap_creator_gh_profile_url = URLField(required=True)
+    roadmap_creator_gh_name = StringField(required=True)
     roadmap_cover_img_url = URLField()
-    roadmap_total_stake = FloatField()
-    roadmap_active_objectives = IntField()
+    roadmap_total_stake = IntField(required=True)
+    roadmap_active_objectives = IntField(required=True)
     roadmap_outcome_types = ListField(
         StringField(
             choices=["Infrastructure", "Tooling", "Publication", "Product", "Other"]
-        )
+        , required=True)
     )
-    roadmap_objectives_list = EmbeddedDocumentListField(RoadmapObjective)
+    roadmap_objectives_list = EmbeddedDocumentListField(RoadmapObjective,required=True)
     roadmap_objectives_graph = DictField()
-    roadmap_creation_date = DateTimeField()
-    roadmap_title = StringField()
+    roadmap_creation_date = DateTimeField(required=True)
+    roadmap_title = StringField(required=True)
     roadmap_outlook = StringField(
         required=True,
         default="Next 2 Yrs",
@@ -63,6 +64,7 @@ class Roadmap(Document):
             "More than 5 Yrs",
         ],
     )
+    roadmap_address = StringField(required=True)
 
     def to_roadmap_json(self):
         return {
@@ -87,9 +89,9 @@ class Contributions(EmbeddedDocument):
     contribution_timestamp = DateTimeField(required=True)
     contributor_project_id = StringField(required=True)
     contributor_project_name = StringField(required=True)
-    contribution_amt = FloatField()
-    contribution_token_symbol = StringField()
-    contribution_token_icon = URLField()
+    contribution_amt = IntField(required=True)
+    contribution_token_symbol = StringField(required=True)
+    contribution_token_icon = URLField(required=True)
 
 
 class ProgressItem(EmbeddedDocument):
@@ -102,12 +104,12 @@ class ProgressItem(EmbeddedDocument):
 
 class Users(Document):
     user_github = StringField(required=True, unique=True)
-    user_phantom_address = StringField()
+    user_phantom_address = StringField(required=True)
     user_fb_uid = StringField(required=True)
-    user_gh_name = StringField()
+    user_gh_name = StringField(required=True)
     user_profile_pic = URLField()
-    user_contributions = EmbeddedDocumentListField(Contributions)
-    user_progress = EmbeddedDocumentListField(ProgressItem)
+    user_contributions = EmbeddedDocumentListField(Contributions,required=True)
+    user_progress = EmbeddedDocumentListField(ProgressItem,required=True)
 
     def fetch_contributions(self):
         contributions = self.to_mongo().to_dict()["user_contributions"]
@@ -128,30 +130,38 @@ class Users(Document):
         return contributions
 
 
-class IssuePRs(EmbeddedDocument):
-    issue_pr_account = StringField()
-    issue_pr_author = StringField()
-    issue_pr_link = URLField()
-    issue_originality_score = IntField()
-    issue_author_github = StringField()
-    issue_title = StringField()
-    issue_vote_amount = IntField()
+class Commit(Document):
+    commit_address = StringField(required=True)
+    commit_creator = ReferenceField(Users,required=True)
+    commit_github_link = StringField(required=True)
 
+class IssuePRs(EmbeddedDocument):
+    issue_pr_account = StringField(required=True)
+    issue_pr_author = StringField(required=True)
+    issue_pr_link = URLField(required=True)
+    issue_originality_score = IntField()
+    issue_author_github = StringField(required=True)
+    issue_title = StringField(required=True)
+    issue_vote_amount = IntField(required=True)
+    pr_stake_am = IntField(required=True)
+    issue_addr = StringField(required=True)
+    commits = EmbeddedDocumentListField(Commit,required=True)
 
 class Issues(Document):
-    issue_account = StringField()
-    issue_creator_gh = StringField()
-    issue_project_id = StringField()
-    issue_project_name = StringField()
-    issue_title = StringField()
-    issue_state = StringField(choices=["open", "voting", "winner_declared", "closed"])
-    issue_summary = StringField()
-    issue_gh_url = URLField()
-    issue_stake_amount = FloatField()
-    issue_stake_token_symbol = StringField()
-    issue_stake_token_url = URLField()
-    issue_prs = EmbeddedDocumentListField(IssuePRs)
+    issue_account = StringField(required=True)
+    issue_creator_gh = StringField(required=True)
+    issue_project_id = StringField(required=True)
+    issue_project_name = StringField(required=True)
+    issue_title = StringField(required=True)
+    issue_state = StringField(choices=["open", "voting", "winner_declared", "closed"],required=True)
+    issue_summary = StringField(required=True)
+    issue_gh_url = URLField(required=True)
+    issue_stake_amount = IntField(required=True)
+    issue_stake_token_symbol = StringField(required=True)
+    issue_stake_token_url = URLField(required=True)
+    issue_prs = EmbeddedDocumentListField(IssuePRs,required=True)
     issue_tags = ListField(StringField())
+    issue_addr = StringField(required=True)
 
     def parse_to_json(self):
         issue_json = self.to_mongo().to_dict()
@@ -160,27 +170,28 @@ class Issues(Document):
 
 
 class Projects(Document):
-    project_account = StringField()
-    project_owner_github = StringField()
-    project_token = ReferenceField(Token)
+    project_account = StringField(required=True)
+    project_owner_github = StringField(required=True)
+    project_token = ReferenceField(Token,required=True)
     project_status = StringField(choices=["Secure", "Vulnerable", "Broken"])
-    project_name = StringField()
-    project_repo_link = URLField()
+    project_name = StringField(required=True)
+    project_repo_link = URLField(required=True)
     top_supporter_name = StringField()
     top_supporter_address = StringField()
     top_builder_name = StringField()
     top_builder_address = StringField()
-    num_open_issues = IntField()
+    num_open_issues = IntField(required=True)
     community_health = IntField()
     community_health_graph = URLField()
-    num_contributions = IntField()
+    num_contributions = IntField(required=True)
     num_contributions_chg_perc = FloatField()
     num_contributions_graph = URLField()
-    is_token_native = BooleanField()
+    is_token_native = BooleanField(required=True)
     internal_tags = DynamicField()
-    coins_staked = FloatField()
-    coins_rewarded = FloatField()
-    claimers_pending = ListField(StringField())
+    coins_staked = FloatField(required=True)
+    coins_rewarded = FloatField(required=True)
+    claimers_pending = ListField(StringField(),required=True)
+    project_addr = StringField(required=True)
 
     def parse_to_json(self, github_id=""):
         project_json = self.to_mongo().to_dict()
