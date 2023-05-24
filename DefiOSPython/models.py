@@ -136,8 +136,7 @@ class IssuePRs(EmbeddedDocument):
     issue_author_github = StringField()
     issue_title = StringField()
     issue_vote_amount = IntField()
-    rewardee = ReferenceField(Users)
-
+    
 
 class Issues(Document):
     issue_account = StringField()
@@ -153,6 +152,7 @@ class Issues(Document):
     issue_stake_token_url = URLField()
     issue_prs = EmbeddedDocumentListField(IssuePRs)
     issue_tags = ListField(StringField())
+    rewardee = ReferenceField(Users)
 
     def parse_to_json(self):
         issue_json = self.to_mongo().to_dict()
