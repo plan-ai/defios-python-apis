@@ -136,6 +136,7 @@ class IssuePRs(EmbeddedDocument):
     issue_author_github = StringField()
     issue_title = StringField()
     issue_vote_amount = IntField()
+    rewardee = ReferenceField(Users)
 
 
 class Issues(Document):
