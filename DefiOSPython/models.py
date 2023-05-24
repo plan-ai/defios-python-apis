@@ -152,7 +152,7 @@ class Issues(Document):
     issue_stake_token_url = URLField()
     issue_prs = EmbeddedDocumentListField(IssuePRs)
     issue_tags = ListField(StringField())
-    rewardee = ReferenceField(Users)
+    rewardee = StringFeild()
 
     def parse_to_json(self):
         issue_json = self.to_mongo().to_dict()
