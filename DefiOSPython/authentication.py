@@ -116,8 +116,8 @@ def generate_jwt(github_uid, firebase_uid, gh_access_token, pub_key):
         )
         message = {"auth_creds": token, "firebase": firebase_uid}
         status_code = 200
-    except Exception:
-        message = {"error": "JWTFetchFailed"}
+    except Exception as err:
+        message = {"error": "JWTFetchFailed","reason":repr(err)}
         status_code = 400
     return make_response(jsonify(message), status_code)
 

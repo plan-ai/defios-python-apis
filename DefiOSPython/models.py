@@ -136,6 +136,7 @@ class IssuePRs(EmbeddedDocument):
     issue_author_github = StringField()
     issue_title = StringField()
     issue_vote_amount = IntField()
+    issue_pr_github = StringField()
     
 
 class Issues(Document):
