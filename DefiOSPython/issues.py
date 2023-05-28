@@ -101,7 +101,7 @@ def fetch_issues(token, request_params):
         status_code = 200
 
     except Exception as err:
-        message = {"error": "IssueFetchError","reason":repr(err)}
+        message = {"error": "IssueFetchError", "reason": repr(err)}
         status_code = 400
 
     return make_response(jsonify(message), status_code)

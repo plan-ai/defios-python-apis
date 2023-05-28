@@ -5,6 +5,13 @@ from mongoengine import EmailField
 from bson import ObjectId
 from datetime import datetime
 
+default_token_dict = {
+    "token_spl_addr": "E1r1HeJdpNuAfKDyBXoLG3i79cTretrCHoXWhhSKGUPt",
+    "token_symbol": "ITD",
+    "token_name": "ItadakimasuDollar",
+    "token_image_url": "https://ipfs.io/ipfs/QmZDH8LNFytG1YaMHcAaBEMFgAK56HCd2vbuTqwbvB1thN",
+}
+
 
 class Token(Document):
     token_name = StringField()
@@ -101,7 +108,7 @@ class ProgressItem(EmbeddedDocument):
 
 
 class Users(Document):
-    user_github = StringField(required=True, unique=True)
+    user_github = StringField(required=True)
     user_phantom_address = StringField()
     user_fb_uid = StringField(required=True)
     user_gh_name = StringField()
@@ -137,7 +144,7 @@ class IssuePRs(EmbeddedDocument):
     issue_title = StringField()
     issue_vote_amount = IntField()
     issue_pr_github = StringField()
-    
+
 
 class Issues(Document):
     issue_account = StringField()
@@ -180,23 +187,26 @@ class Projects(Document):
     num_contributions_graph = URLField()
     is_token_native = BooleanField()
     internal_tags = DynamicField()
-    coins_staked = FloatField()
-    coins_rewarded = FloatField()
+    coins_staked = FloatField(default=0)
+    coins_rewarded = FloatField(default=0)
     claimers_pending = ListField(StringField())
 
     def parse_to_json(self, github_id=""):
         project_json = self.to_mongo().to_dict()
         project_json["_id"] = str(project_json["_id"])
         project_json["project_token"] = (
-            Token.objects(id=project_json["project_token"]).first().to_mongo().to_dict()
+            default_token_dict
+            if self.project_token is None
+            else self.project_token.to_mongo().to_dict()
         )
         if github_id in project_json["claimers_pending"]:
             project_json["claimable"] = True
         else:
             project_json["claimable"] = False
-        project_json["coins_staked"] = 100.1
-        project_json["coins_rewarded"] = 100.1
-        del project_json["project_token"]["_id"]
+        project_json["coins_staked"] = self.coins_staked
+        project_json["coins_rewarded"] = self.coins_rewarded
+        if "_id" in project_json["project_token"]:
+            del project_json["project_token"]["_id"]
         return project_json
 
 

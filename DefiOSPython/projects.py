@@ -1,9 +1,10 @@
-from models import Projects, Token
+from models import Projects
 from authentication import validate_user
 from flask import make_response, jsonify
 from bson.objectid import ObjectId
 from utils import remove_dups_by_id
 import json
+import traceback
 
 
 def fetch_projects(token, request_params):
@@ -26,7 +27,6 @@ def fetch_projects(token, request_params):
     isAuthorized, resp = validate_user(token)
     if not isAuthorized:
         return resp
-
     try:
         start_id = request_params.get("first_id", None)
         filter_params = {
@@ -85,8 +85,8 @@ def fetch_projects(token, request_params):
             message["projects"] = remove_dups_by_id(message["projects"])
 
         status_code = 200
-    except:
-        message = {"error": "ProjectsFetchFailed"}
+    except Exception as err:
+        message = {"error": "ProjectsFetchFailed", "reason": repr(err)}
         status_code = 400
     return make_response(jsonify(message), status_code)
 
@@ -144,7 +144,9 @@ def fetch_projects_minified(token):
             message.append(
                 {
                     "project_name": project.project_name,
-                    "token_url": project.project_token.token_image_url,
+                    "token_url": "https://ipfs.io/ipfs/QmZDH8LNFytG1YaMHcAaBEMFgAK56HCd2vbuTqwbvB1thN"
+                    if project.project_token is None
+                    else project.project_token.token_image_url,
                     "id": str(project.id),
                     "account": project.project_account,
                     "project_url": "https://github.com/defi-os/defios-alpha"
