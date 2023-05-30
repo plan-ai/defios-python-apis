@@ -1,4 +1,4 @@
-from models import Token
+from models import Token, Projects
 from authentication import validate_user
 from flask import make_response, jsonify
 
@@ -58,11 +58,15 @@ def fetch_token_list(token):
         tokens = Token.objects.only(
             "token_image_url", "token_symbol", "token_spl_addr"
         ).all()
-        message = [i.to_mongo().to_dict() for i in tokens]
-        for i in message:
-            del i["_id"]
+        messages = []
+        for i in tokens:
+            project = Projects.objects(project_token=i).first()
+            message = i.to_mongo().to_dict()
+            del message["_id"]
+            message["repository"] = "" if project is None else project.project_account
+            messages.append(message)
         status_code = 200
-    except Exception:
-        message = {"error": "TokenListFetchFailed"}
+    except Exception as err:
+        messages = {"error": "TokenListFetchFailed","reason":repr(err)}
         status_code = 400
-    return make_response(jsonify(message), status_code)
+    return make_response(jsonify(messages), status_code)
