@@ -11,11 +11,15 @@ from roadmaps import get_roadmaps
 from homepage import fetch_homepage
 from swap import fetch_token_details, fetch_token_list
 from portfolio_generator import generate_portfolio_website
+import configparser
+
+config = configparser.ConfigParser()
+config.read('config.ini')
 
 app = Flask(__name__)
 api = Api(app)
 cors = CORS(app)
-mongoengine.connect("DefiOS")
+mongoengine.connect(host=config["MONGODB"]["HOST"])
 
 
 class Notifications(Resource):
