@@ -67,6 +67,6 @@ def fetch_token_list(token):
             messages.append(message)
         status_code = 200
     except Exception as err:
-        messages = {"error": "TokenListFetchFailed","reason":repr(err)}
+        messages = {"error": "TokenListFetchFailed", "reason": repr(err)}
         status_code = 400
     return make_response(jsonify(messages), status_code)

@@ -14,7 +14,7 @@ from portfolio_generator import generate_portfolio_website
 import configparser
 
 config = configparser.ConfigParser()
-config.read('config.ini')
+config.read("config.ini")
 
 app = Flask(__name__)
 api = Api(app)
