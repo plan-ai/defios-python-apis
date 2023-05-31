@@ -125,6 +125,11 @@ class Users(Document):
         contributors_data = {i.user_github: i for i in contributors_data}
 
         for contribution in contributions:
+            token = Token.objects(
+                token_symbol=contribution["contribution_token_symbol"]
+            ).first()
+            contribution["token_spl_addr"] = token.token_spl_addr
+            contribution["token_image_url"] = token.token_image_url
             contribution["contributor_name"] = contributors_data[
                 contribution["contributor_github"]
             ].user_gh_name
