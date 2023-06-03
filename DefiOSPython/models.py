@@ -30,8 +30,7 @@ class Token(Document):
 
 
 class RoadmapObjective(EmbeddedDocument):
-    objective_id = StringField()
-    roadmap_id = StringField()
+    roadmap = ReferenceField(Roadmap)
     objective_title = StringField(required=True)
     objective_creation_date = DateTimeField()
     objective_creator_gh_name = StringField()
@@ -47,7 +46,6 @@ class RoadmapObjective(EmbeddedDocument):
 
 
 class Roadmap(Document):
-    roadmap_id = StringField()
     roadmap_creator_gh = StringField()
     roadmap_creator_gh_profile_url = URLField()
     roadmap_creator_gh_name = StringField(required=True, default="")
@@ -76,7 +74,7 @@ class Roadmap(Document):
 
     def to_roadmap_json(self):
         return {
-            "id":self.roadmap_id,
+            "id":self._id,
             "title": self.roadmap_title,
             "creation_date": datetime.strftime(
                 self.roadmap_creation_date, "%Y-%m-%dT%H:%M:%s"
