@@ -57,11 +57,8 @@ def fetch_homepage(token):
         )
         message["issues"] = [i.parse_to_json() for i in message["issues"]]
 
-        message["roadmap"] = (
-            Roadmap.objects.order_by("-roadmap_active_objectives")
-            .first()
-            .to_roadmap_json()
-        )
+        roadmap = Roadmap.objects.order_by("-roadmap_active_objectives").first()
+        message["roadmap"] = {} if roadmap is None else roadmap.to_roadmap_json()
 
         message["paths"] = fetch_progress_json(resp.user_progress)
 
@@ -75,7 +72,7 @@ def fetch_homepage(token):
             message["projects"] = {}
 
         status_code = 200
-    except:
-        message = {"error": "HomepageFetchFailed"}
+    except Exception as err:
+        message = {"error": "HomepageFetchFailed", "reason":repr(err)}
         status_code = 400
     return make_response(jsonify(message), status_code)
