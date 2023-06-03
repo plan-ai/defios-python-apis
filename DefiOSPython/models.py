@@ -71,11 +71,13 @@ class Roadmap(Document):
             "More than 5 Yrs",
         ],
     )
+    roadmap_description: StringField()
 
     def to_roadmap_json(self):
         return {
             "id":self._id,
             "title": self.roadmap_title,
+            "description":roadmap_description,
             "creation_date": datetime.strftime(
                 self.roadmap_creation_date, "%Y-%m-%dT%H:%M:%s"
             ),
