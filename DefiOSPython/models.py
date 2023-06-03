@@ -30,7 +30,7 @@ class Token(Document):
 
 
 class RoadmapObjective(EmbeddedDocument):
-    roadmap = ReferenceField(Roadmap)
+    roadmap = StringField()
     objective_title = StringField(required=True)
     objective_creation_date = DateTimeField()
     objective_creator_gh_name = StringField()
@@ -57,7 +57,7 @@ class Roadmap(Document):
             choices=["Infrastructure", "Tooling", "Publication", "Product", "Other"]
         )
     )
-    roadmap_objectives_list = EmbeddedDocumentListField(RoadmapObjective)
+    roadmap_objectives_list = EmbeddedDocumentListField(RoadmapObjective, default = [])
     roadmap_objectives_graph = DictField(default = {})
     roadmap_creation_date = DateTimeField()
     roadmap_title = StringField()
