@@ -50,7 +50,6 @@ class Roadmap(Document):
     roadmap_creator_gh_profile_url = URLField()
     roadmap_creator_gh_name = StringField(required=True, default="")
     roadmap_cover_img_url = URLField()
-    roadmap_total_stake = FloatField()
     roadmap_active_objectives = IntField()
     roadmap_outcome_types = ListField(
         StringField(
@@ -77,17 +76,16 @@ class Roadmap(Document):
         return {
             "id":self._id,
             "title": self.roadmap_title,
-            "description":roadmap_description,
+            "description":self.roadmap_description,
             "creation_date": datetime.strftime(
                 self.roadmap_creation_date, "%Y-%m-%dT%H:%M:%s"
             ),
             "creator": self.roadmap_creator_gh,
             "creator_profile_pic": self.roadmap_creator_gh_profile_url,
             "creator_name": self.roadmap_creator_gh_name,
-            "total_stake": self.roadmap_total_stake,
             "cover_image": self.roadmap_cover_img_url,
             "active_objectives": self.roadmap_active_objectives,
-            "outcomes": list(set(self.roadmap_outcome_types)),
+            "outcome": self.roadmap_outcome_types,
             "roadmap_graph": self.roadmap_objectives_graph
         }
 
