@@ -73,6 +73,6 @@ def fetch_homepage(token):
 
         status_code = 200
     except Exception as err:
-        message = {"error": "HomepageFetchFailed", "reason":repr(err)}
+        message = {"error": "HomepageFetchFailed", "reason": repr(err)}
         status_code = 400
     return make_response(jsonify(message), status_code)

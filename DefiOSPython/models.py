@@ -56,8 +56,8 @@ class Roadmap(Document):
             choices=["Infrastructure", "Tooling", "Publication", "Product", "Other"]
         )
     )
-    roadmap_objectives_list = EmbeddedDocumentListField(RoadmapObjective, default = [])
-    roadmap_objectives_graph = DictField(default = {})
+    roadmap_objectives_list = EmbeddedDocumentListField(RoadmapObjective, default=[])
+    roadmap_objectives_graph = DictField(default={})
     roadmap_creation_date = DateTimeField()
     roadmap_title = StringField()
     roadmap_outlook = StringField(
@@ -74,9 +74,9 @@ class Roadmap(Document):
 
     def to_roadmap_json(self):
         return {
-            "id":self._id,
+            "id": self._id,
             "title": self.roadmap_title,
-            "description":self.roadmap_description,
+            "description": self.roadmap_description,
             "creation_date": datetime.strftime(
                 self.roadmap_creation_date, "%Y-%m-%dT%H:%M:%s"
             ),
@@ -86,7 +86,7 @@ class Roadmap(Document):
             "cover_image": self.roadmap_cover_img_url,
             "active_objectives": self.roadmap_active_objectives,
             "outcome": self.roadmap_outcome_types,
-            "roadmap_graph": self.roadmap_objectives_graph
+            "roadmap_graph": self.roadmap_objectives_graph,
         }
 
 

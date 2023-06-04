@@ -52,13 +52,7 @@ def get_roadmaps(token, request_params):
         }
 
         for filter_param in filter_params:
-            if filter_param == "roadmap_total_stake":
-                filter_params["roadmap_total_stake"] = {
-                    "$gte": float(filter_params["roadmap_total_stake"].split(",")[0]),
-                    "$lt": float(filter_params["roadmap_total_stake"].split(",")[1]),
-                }
-
-            elif filter_param == "roadmap_active_objectives":
+            if filter_param == "roadmap_active_objectives":
                 filter_params["roadmap_active_objectives"] = {
                     "$gte": float(
                         filter_params["roadmap_active_objectives"].split(",")[0]
