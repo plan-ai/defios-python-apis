@@ -53,11 +53,6 @@ class Roadmap(Document):
     roadmap_creator_gh_name = StringField(required=True, default="")
     roadmap_cover_img_url = URLField()
     roadmap_active_objectives = IntField()
-    roadmap_outcome_types = ListField(
-        StringField(
-            choices=["Infrastructure", "Tooling", "Publication", "Product", "Other"]
-        )
-    )
     roadmap_objectives_list = EmbeddedDocumentListField(RoadmapObjective, default=[])
     roadmap_objectives_graph = DictField(default={})
     roadmap_creation_date = DateTimeField()
@@ -87,7 +82,6 @@ class Roadmap(Document):
             "creator_name": self.roadmap_creator_gh_name,
             "cover_image": self.roadmap_cover_img_url,
             "active_objectives": self.roadmap_active_objectives,
-            "outcome": self.roadmap_outcome_types,
             "roadmap_graph": self.roadmap_objectives_graph,
         }
 
