@@ -29,7 +29,7 @@ class Token(Document):
     meta = {"collection": "tokens"}
 
 
-class RoadmapObjective(EmbeddedDocument):
+class RoadmapObjective(Document):
     roadmap = StringField()
     objective_key = StringField()
     objective_title = StringField(required=True)
@@ -44,6 +44,7 @@ class RoadmapObjective(EmbeddedDocument):
     )
     objective_start_date = DateTimeField()
     objective_end_date = DateTimeField()
+    child_objectives = ListField(StringField())
 
 
 class Roadmap(Document):
@@ -53,7 +54,7 @@ class Roadmap(Document):
     roadmap_creator_gh_name = StringField(required=True, default="")
     roadmap_cover_img_url = URLField()
     roadmap_active_objectives = IntField()
-    roadmap_objectives_list = EmbeddedDocumentListField(RoadmapObjective, default=[])
+    roadmap_objectives_list = ListField(ReferenceField(RoadmapObjective), default=[])
     roadmap_objectives_graph = DictField(default={})
     roadmap_creation_date = DateTimeField()
     roadmap_title = StringField()
