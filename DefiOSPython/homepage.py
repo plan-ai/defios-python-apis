@@ -1,5 +1,5 @@
 from authentication import validate_user
-from models import Roadmap, Token, Issues, Projects
+from models import Roadmaps, Token, Issues, Projects
 from flask import make_response, jsonify
 from collections import defaultdict
 
@@ -57,7 +57,7 @@ def fetch_homepage(token):
         )
         message["issues"] = [i.parse_to_json() for i in message["issues"]]
 
-        roadmap = Roadmap.objects.order_by("-roadmap_active_objectives").first()
+        roadmap = Roadmaps.objects.order_by("-roadmap_active_objectives").first()
         message["roadmap"] = {} if roadmap is None else roadmap.to_roadmap_json()
 
         message["paths"] = fetch_progress_json(resp.user_progress)

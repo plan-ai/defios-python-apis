@@ -1,7 +1,6 @@
-from models import Roadmap
+from models import Roadmaps
 from authentication import validate_user
 from flask import jsonify, make_response
-import json
 
 
 def get_roadmaps(token, request_params):
@@ -68,13 +67,13 @@ def get_roadmaps(token, request_params):
                 }
 
         roadmaps = (
-            Roadmap.objects(__raw__=search_params | filter_params)
+            Roadmaps.objects(__raw__=search_params | filter_params)
             .exclude("roadmap_objectives_list", "roadmap_objectives_graph")
             .all()
         )
         message = [i.to_roadmap_json() for i in roadmaps]
         status_code = 200
-    except Exception:
-        message = {"error": "FetchRoadmapsFailed"}
+    except Exception as err:
+        message = {"error": "FetchRoadmapsFailed", "reason": repr(err)}
         status_code = 400
     return make_response(jsonify(message), status_code)

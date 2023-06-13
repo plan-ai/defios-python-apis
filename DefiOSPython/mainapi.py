@@ -19,7 +19,7 @@ config.read("config.ini")
 app = Flask(__name__)
 api = Api(app)
 cors = CORS(app)
-mongoengine.connect(host=config["MONGODB"]["HOST"])
+mongoengine.connect(config["MONGODB"]["HOST"])
 
 
 class Notifications(Resource):

@@ -47,13 +47,13 @@ class RoadmapObjective(Document):
     child_objectives = ListField(StringField())
 
 
-class Roadmap(Document):
+class Roadmaps(Document):
     roadmap_key = StringField()
     roadmap_creator_gh = StringField()
     roadmap_creator_gh_profile_url = URLField()
     roadmap_creator_gh_name = StringField(required=True, default="")
     roadmap_cover_img_url = URLField()
-    roadmap_active_objectives = IntField()
+    roadmap_active_objectives = IntField(default=0)
     roadmap_objectives_list = ListField(ReferenceField(RoadmapObjective), default=[])
     roadmap_objectives_graph = DictField(default={})
     roadmap_creation_date = DateTimeField()
@@ -68,11 +68,11 @@ class Roadmap(Document):
             "More than 5 Yrs",
         ],
     )
-    roadmap_description: StringField()
+    roadmap_description = StringField(required=False)
 
     def to_roadmap_json(self):
         return {
-            "id": self._id,
+            "id": str(self.id),
             "title": self.roadmap_title,
             "description": self.roadmap_description,
             "creation_date": datetime.strftime(
