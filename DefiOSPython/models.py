@@ -2,7 +2,6 @@ from mongoengine import Document, IntField, StringField, URLField, DictField
 from mongoengine import EmbeddedDocument, DateTimeField, ReferenceField, DynamicField
 from mongoengine import BooleanField, FloatField, ListField, EmbeddedDocumentListField
 from mongoengine import EmailField
-from bson import ObjectId
 from datetime import datetime
 
 default_token_dict = {
@@ -26,6 +25,7 @@ class Token(Document):
     token_creator_name = StringField()
     token_creation_date = DateTimeField()
     token_repository_link = URLField()
+    token_new = BooleanField(default=True)
     meta = {"collection": "tokens"}
 
 

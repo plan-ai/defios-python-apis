@@ -4,7 +4,6 @@ from flask import make_response, jsonify
 from bson.objectid import ObjectId
 from utils import remove_dups_by_id
 import json
-import traceback
 
 
 def fetch_projects(token, request_params):
