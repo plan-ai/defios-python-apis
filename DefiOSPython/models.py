@@ -221,8 +221,13 @@ class Roadmaps(Document):
     def to_roadmap_json(self):
         return {
             "id": str(self.id),
-            "roadmap_key":self.roadmap_key,
-            "project":"" if self.roadmap_project is None else str(self.roadmap_project.id),
+            "roadmap_key": self.roadmap_key,
+            "project": ""
+            if self.roadmap_project is None
+            else str(self.roadmap_project.id),
+            "project_account": ""
+            if self.roadmap_project is None
+            else self.roadmap_project.project_account,
             "title": self.roadmap_title,
             "description": self.roadmap_description,
             "creation_date": datetime.strftime(
