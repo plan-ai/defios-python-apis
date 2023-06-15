@@ -29,64 +29,6 @@ class Token(Document):
     meta = {"collection": "tokens"}
 
 
-class RoadmapObjective(Document):
-    roadmap = StringField()
-    objective_key = StringField()
-    objective_title = StringField(required=True)
-    objective_creation_date = DateTimeField()
-    objective_creator_gh_name = StringField()
-    objective_creator_gh_profile_pic = URLField()
-    objective_deliverable = StringField(
-        choices=["Infrastructure", "Tooling", "Publication", "Product", "Other"]
-    )
-    objective_state = StringField(
-        choices=["Locked", "InProgress", "Closed", "Deprecated"]
-    )
-    objective_start_date = DateTimeField()
-    objective_end_date = DateTimeField()
-    child_objectives = ListField(StringField())
-
-
-class Roadmaps(Document):
-    roadmap_key = StringField()
-    roadmap_creator_gh = StringField()
-    roadmap_creator_gh_profile_url = URLField()
-    roadmap_creator_gh_name = StringField(required=True, default="")
-    roadmap_cover_img_url = URLField()
-    roadmap_active_objectives = IntField(default=0)
-    roadmap_objectives_list = ListField(ReferenceField(RoadmapObjective), default=[])
-    roadmap_objectives_graph = DictField(default={})
-    roadmap_creation_date = DateTimeField()
-    roadmap_title = StringField()
-    roadmap_outlook = StringField(
-        required=True,
-        default="Next 2 Yrs",
-        choices=[
-            "Next 2 Yrs",
-            "Long-Term Public Good",
-            "Next 5 Yrs",
-            "More than 5 Yrs",
-        ],
-    )
-    roadmap_description = StringField(required=False)
-
-    def to_roadmap_json(self):
-        return {
-            "id": str(self.id),
-            "title": self.roadmap_title,
-            "description": self.roadmap_description,
-            "creation_date": datetime.strftime(
-                self.roadmap_creation_date, "%Y-%m-%dT%H:%M:%s"
-            ),
-            "creator": self.roadmap_creator_gh,
-            "creator_profile_pic": self.roadmap_creator_gh_profile_url,
-            "creator_name": self.roadmap_creator_gh_name,
-            "cover_image": self.roadmap_cover_img_url,
-            "active_objectives": self.roadmap_active_objectives,
-            "roadmap_graph": self.roadmap_objectives_graph,
-        }
-
-
 class Contributions(EmbeddedDocument):
     contribution_type = StringField(required=True, choices=["inbound", "outbound"])
     contributor_github = StringField(required=True)
@@ -232,3 +174,62 @@ class Notifications(Document):
 class Waitlist(Document):
     waitlist_email = EmailField()
     waitlist_type = StringField(choices=["jobs", "enterprise"])
+
+
+class RoadmapObjective(Document):
+    roadmap = StringField()
+    objective_key = StringField()
+    objective_title = StringField(required=True)
+    objective_creation_date = DateTimeField()
+    objective_creator_gh_name = StringField()
+    objective_creator_gh_profile_pic = URLField()
+    objective_deliverable = StringField(
+        choices=["Infrastructure", "Tooling", "Publication", "Product", "Other"]
+    )
+    objective_state = StringField(
+        choices=["Locked", "InProgress", "Closed", "Deprecated"]
+    )
+    objective_start_date = DateTimeField()
+    objective_end_date = DateTimeField()
+    child_objectives = ListField(StringField())
+
+
+class Roadmaps(Document):
+    roadmap_key = StringField()
+    roadmap_creator_gh = StringField()
+    roadmap_creator_gh_profile_url = URLField()
+    roadmap_creator_gh_name = StringField(required=True, default="")
+    roadmap_cover_img_url = URLField()
+    roadmap_active_objectives = IntField(default=0)
+    roadmap_objectives_list = ListField(ReferenceField(RoadmapObjective), default=[])
+    roadmap_objectives_graph = DictField(default={})
+    roadmap_creation_date = DateTimeField()
+    roadmap_title = StringField()
+    roadmap_outlook = StringField(
+        required=True,
+        default="Next 2 Yrs",
+        choices=[
+            "Next 2 Yrs",
+            "Long-Term Public Good",
+            "Next 5 Yrs",
+            "More than 5 Yrs",
+        ],
+    )
+    roadmap_description = StringField(required=False)
+    roadmap_project = ReferenceField(Projects)
+
+    def to_roadmap_json(self):
+        return {
+            "id": str(self.id),
+            "title": self.roadmap_title,
+            "description": self.roadmap_description,
+            "creation_date": datetime.strftime(
+                self.roadmap_creation_date, "%Y-%m-%dT%H:%M:%s"
+            ),
+            "creator": self.roadmap_creator_gh,
+            "creator_profile_pic": self.roadmap_creator_gh_profile_url,
+            "creator_name": self.roadmap_creator_gh_name,
+            "cover_image": self.roadmap_cover_img_url,
+            "active_objectives": self.roadmap_active_objectives,
+            "roadmap_graph": self.roadmap_objectives_graph,
+        }
