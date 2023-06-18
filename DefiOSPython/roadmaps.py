@@ -68,7 +68,7 @@ def get_roadmaps(token, request_params):
 
         roadmaps = (
             Roadmaps.objects(__raw__=search_params | filter_params)
-            .exclude("roadmap_objectives_list", "roadmap_objectives_graph")
+            .exclude("roadmap_objectives_graph")
             .all()
         )
         message = [i.to_roadmap_json() for i in roadmaps]
