@@ -77,3 +77,29 @@ def get_roadmaps(token, request_params):
         message = {"error": "FetchRoadmapsFailed", "reason": repr(err)}
         status_code = 400
     return make_response(jsonify(message), status_code)
+
+
+def get_roadmap_objectives(auth: str, roadmap_id: str):
+    isAuthorized, resp = validate_user(auth)
+    if not isAuthorized:
+        return resp
+    try:
+        roadmap = (
+            Roadmaps.objects(id=roadmap_id)
+            .only("roadmap_objectives_graph", "roadmap_objectives_list")
+            .first()
+        )
+        if roadmap is None:
+            message = {"error": "No such roadmap exists"}
+            status_code = 404
+        else:
+            message = {
+                "roadmap_id": roadmap_id,
+                "objective_graph": roadmap.roadmap_objectives_graph,
+                "objectives_list": roadmap.roadmap_objectives_list,
+            }
+            status_code = 200
+    except Exception as err:
+        message = {"error": "FetchRoadmapObjectivesFailed", "reason": repr(err)}
+        status_code = 400
+    return make_response(jsonify(message), status_code)

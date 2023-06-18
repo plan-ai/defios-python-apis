@@ -7,7 +7,7 @@ from notifications import fetch_notifications, post_notifications, mark_notifs_a
 from projects import fetch_projects, fetch_projects_minified
 from issues import fetch_issues
 from user_profile import profile_contributions, update_user_progress
-from roadmaps import get_roadmaps
+from roadmaps import get_roadmaps, get_roadmap_objectives
 from homepage import fetch_homepage
 from swap import fetch_token_details, fetch_token_list
 from portfolio_generator import generate_portfolio_website
@@ -48,7 +48,10 @@ class Roadmaps(Resource):
 
 
 class RoadmapObjectives(Resource):
-    pass
+    def get(self):
+        return get_roadmap_objectives(
+            request.headers.get("Authorization"), request.get_json()["roadmap_id"]
+        )
 
 
 class NotificationsRead(Resource):

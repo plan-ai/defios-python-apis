@@ -202,7 +202,7 @@ class Roadmaps(Document):
     roadmap_cover_img_url = URLField()
     roadmap_active_objectives = IntField(default=0)
     roadmap_objectives_list = ListField(ReferenceField(RoadmapObjective), default=[])
-    roadmap_objectives_graph = ListField(StringField,default=[])
+    roadmap_objectives_graph = ListField(StringField, default=[])
     roadmap_creation_date = DateTimeField()
     roadmap_title = StringField()
     roadmap_outlook = StringField(
@@ -237,6 +237,4 @@ class Roadmaps(Document):
             "creator_profile_pic": self.roadmap_creator_gh_profile_url,
             "creator_name": self.roadmap_creator_gh_name,
             "cover_image": self.roadmap_cover_img_url,
-            "active_objectives": self.roadmap_active_objectives,
-            "roadmap_graph": self.roadmap_objectives_graph,
         }
