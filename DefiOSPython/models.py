@@ -192,6 +192,7 @@ class RoadmapObjective(Document):
     objective_start_date = DateTimeField()
     objective_end_date = DateTimeField()
     child_objectives = ListField(StringField())
+    meta = {"collection": "roadmapobjectives"}
 
 
 class Roadmaps(Document):

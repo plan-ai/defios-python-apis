@@ -1,4 +1,4 @@
-from models import Roadmaps,RoadmapObjective
+from models import Roadmaps, RoadmapObjective
 from authentication import validate_user
 from flask import jsonify, make_response
 
@@ -94,10 +94,15 @@ def get_roadmap_objectives(auth: str, roadmap_key: str):
             status_code = 404
         else:
             objectives = RoadmapObjective.objects(roadmap=roadmap_key)
+            objective_list = []
+            for objective in objectives:
+                objective = objective.to_mongo().to_dict()
+                del objective["_id"]
+                objective_list.append(objective)
             message = {
                 "roadmap_key": roadmap_key,
                 "objective_graph": roadmap.roadmap_objectives_graph,
-                "objectives_list": [objective.to_dict().to_json() for objective in objectives]
+                "objectives_list": objective_list,
             }
             print(message)
             status_code = 200
