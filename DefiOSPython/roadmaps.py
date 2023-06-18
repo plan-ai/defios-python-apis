@@ -1,4 +1,4 @@
-from models import Roadmaps
+from models import Roadmaps,RoadmapObjective
 from authentication import validate_user
 from flask import jsonify, make_response
 
@@ -79,25 +79,27 @@ def get_roadmaps(token, request_params):
     return make_response(jsonify(message), status_code)
 
 
-def get_roadmap_objectives(auth: str, roadmap_id: str):
+def get_roadmap_objectives(auth: str, roadmap_key: str):
     isAuthorized, resp = validate_user(auth)
     if not isAuthorized:
         return resp
     try:
         roadmap = (
-            Roadmaps.objects(id=roadmap_id)
-            .only("roadmap_objectives_graph", "roadmap_objectives_list")
+            Roadmaps.objects(roadmap_key=roadmap_key)
+            .only("roadmap_objectives_graph")
             .first()
         )
         if roadmap is None:
             message = {"error": "No such roadmap exists"}
             status_code = 404
         else:
+            objectives = RoadmapObjective.objects(roadmap=roadmap_key)
             message = {
-                "roadmap_id": roadmap_id,
+                "roadmap_key": roadmap_key,
                 "objective_graph": roadmap.roadmap_objectives_graph,
-                "objectives_list": roadmap.roadmap_objectives_list,
+                "objectives_list": [objective.to_dict().to_json() for objective in objectives]
             }
+            print(message)
             status_code = 200
     except Exception as err:
         message = {"error": "FetchRoadmapObjectivesFailed", "reason": repr(err)}

@@ -50,7 +50,7 @@ class Roadmaps(Resource):
 class RoadmapObjectives(Resource):
     def get(self):
         return get_roadmap_objectives(
-            request.headers.get("Authorization"), request.get_json()["roadmap_id"]
+            request.headers.get("Authorization"), request.get_json()["roadmap_key"]
         )
 
 
