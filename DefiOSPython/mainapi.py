@@ -4,7 +4,7 @@ import mongoengine
 from flask_cors import CORS
 from authentication import generate_jwt, add_to_waitlist
 from notifications import fetch_notifications, post_notifications, mark_notifs_as_read
-from projects import fetch_projects, fetch_projects_minified
+from projects import fetch_projects, fetch_projects_minified, edit_token
 from issues import fetch_issues
 from user_profile import profile_contributions, update_user_progress
 from roadmaps import get_roadmaps, get_roadmap_objectives
@@ -35,6 +35,13 @@ class Notifications(Resource):
 class Projects(Resource):
     def get(self):
         return fetch_projects(request.headers.get("Authorization"), request.args)
+
+    def post(self):
+        return edit_token(
+            request.headers.get("Authorization"),
+            request.args.get("project_key"),
+            request.get_json(),
+        )
 
 
 class Issues(Resource):
@@ -125,13 +132,6 @@ class JobsPreSignups(Resource):
         return add_to_waitlist(request.args.get("email"), request.args.get("wl_type"))
 
 
-class MarkTokensAsClaimed(Resource):
-    def delete(self):
-        return mark_tokens_as_claimed(
-            request.headers.get("Authorization"), request.args.get("project_id")
-        )
-
-
 api.add_resource(Notifications, "/notifications")
 api.add_resource(NotificationsRead, "/notifications/read")
 api.add_resource(Projects, "/projects")
@@ -149,7 +149,6 @@ api.add_resource(SanityCheck, "/")
 api.add_resource(HomepageAPI, "/home")
 api.add_resource(UpdateProgress, "/progress/new")
 api.add_resource(JobsPreSignups, "/waitlist/jobs")
-api.add_resource(MarkTokensAsClaimed, "/projects/claims")
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=8001, debug=True)

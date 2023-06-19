@@ -1,4 +1,4 @@
-from models import Projects
+from models import Projects, Token
 from authentication import validate_user
 from flask import make_response, jsonify
 from bson.objectid import ObjectId
@@ -154,6 +154,36 @@ def fetch_projects_minified(token):
                 }
             )
         status_code = 200
+    except Exception:
+        message = {"error": "Project Fetch Failed"}
+        status_code = 400
+    return make_response(jsonify(message), status_code)
+
+
+def edit_token(auth: str, project_key: str, args: dict):
+    isAuthorized, resp = validate_user(auth)
+    if not isAuthorized:
+        return resp
+    try:
+        project = (
+            Projects.objects(project_key=project_key).only("roadmap_creator_gh").first()
+        )
+        if resp.user_github == project.roadmap_creator_gh:
+            token = Token.objects(token_symbol=args["symbol"]).first()
+            if token is None:
+                token = Token(
+                    token_name=args["name"],
+                    token_symbol=args["symbol"],
+                    token_image_url=args["image"],
+                    token_new=False,
+                )
+                token.save()
+            project.update(set__project_token=token)
+            message = {"message": "Token added sucessfullt"}
+            status_code = 200
+        else:
+            message = {"message": "Not authorized to perform this action"}
+            status_code = 401
     except Exception:
         message = {"error": "Project Fetch Failed"}
         status_code = 400
