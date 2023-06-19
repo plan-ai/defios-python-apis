@@ -190,6 +190,8 @@ class RoadmapObjective(Document):
         choices=["Locked", "InProgress", "Closed", "Deprecated"]
     )
     objective_start_date = DateTimeField()
+    objective_description = StringField()
+    objective_issue_account = StringField()
     objective_end_date = DateTimeField()
     child_objectives = ListField(StringField())
     meta = {"collection": "roadmapobjectives"}
@@ -222,6 +224,7 @@ class Roadmaps(Document):
         return {
             "id": str(self.id),
             "roadmap_key": self.roadmap_key,
+            "outlook": "" if self.roadmap_outlook is None else self.roadmap_outlook,
             "project": ""
             if self.roadmap_project is None
             else str(self.roadmap_project.id),
