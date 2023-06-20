@@ -165,7 +165,11 @@ def edit_token(auth: str, project_key: str, args: dict):
     if not isAuthorized:
         return resp
     try:
-        project = Projects.objects(project_account=project_key).only("project_owner_github").first()
+        project = (
+            Projects.objects(project_account=project_key)
+            .only("project_owner_github")
+            .first()
+        )
         if resp.user_github == project.project_owner_github:
             token = Token.objects(token_spl_addr=args["spl_addr"]).first()
             if token is None:
@@ -173,7 +177,7 @@ def edit_token(auth: str, project_key: str, args: dict):
                     token_name=args["name"],
                     token_symbol=args["symbol"],
                     token_image_url=args["image"],
-                    token_spl_addr = args["spl_addr"],
+                    token_spl_addr=args["spl_addr"],
                     token_new=False,
                 )
                 token.save()
