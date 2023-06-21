@@ -9,6 +9,7 @@ def get_token(auth:str,token_addr:str):
     try:
         token = Token.objects(token_spl_addr=token_addr).first()
         message = token.to_mongo().to_dict()
+        del message["_id"]
         status_code=200
     except Exception:
         message = {"error": "NotificationFetchFailed"}

@@ -16,6 +16,7 @@ class Token(Document):
     token_name = StringField()
     token_spl_addr = StringField()
     token_symbol = StringField()
+    token_decimals = IntField()
     token_image_url = StringField()
     token_price_feed = URLField()
     token_ltp = FloatField()
