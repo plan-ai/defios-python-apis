@@ -55,7 +55,7 @@ def fetch_token_list(token):
     if not isAuthorized:
         return resp
     try:
-        tokens = Token.objects.only(
+        tokens = Token.objects(token_new=True).only(
             "token_image_url", "token_symbol", "token_spl_addr"
         ).all()
         messages = []
