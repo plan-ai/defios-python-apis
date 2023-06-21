@@ -146,6 +146,9 @@ def fetch_projects_minified(token):
                     "token_url": "https://ipfs.io/ipfs/QmZDH8LNFytG1YaMHcAaBEMFgAK56HCd2vbuTqwbvB1thN"
                     if project.project_token is None
                     else project.project_token.token_image_url,
+                    "token_address": "E1r1HeJdpNuAfKDyBXoLG3i79cTretrCHoXWhhSKGUPt"
+                    if project.project_token is None
+                    else project.project_token.token_spl_addr,
                     "id": str(project.id),
                     "account": project.project_account,
                     "project_url": "https://github.com/defi-os/defios-alpha"

@@ -22,10 +22,14 @@ api = Api(app)
 cors = CORS(app)
 mongoengine.connect(config["MONGODB"]["HOST"])
 
+
 class Tokens(Resource):
     def get(self):
-        return get_token(request.headers.get("Authorization"),request.args.get("token_addr"))
-    
+        return get_token(
+            request.headers.get("Authorization"), request.args.get("token_addr")
+        )
+
+
 class Notifications(Resource):
     def get(self):
         return fetch_notifications(request.headers.get("Authorization"))
@@ -152,6 +156,6 @@ api.add_resource(SanityCheck, "/")
 api.add_resource(HomepageAPI, "/home")
 api.add_resource(UpdateProgress, "/progress/new")
 api.add_resource(JobsPreSignups, "/waitlist/jobs")
-api.add_resource(Tokens,"/tokens")
+api.add_resource(Tokens, "/tokens")
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=8001, debug=True)
