@@ -11,6 +11,7 @@ from roadmaps import get_roadmaps, get_roadmap_objectives
 from homepage import fetch_homepage
 from swap import fetch_token_details, fetch_token_list
 from portfolio_generator import generate_portfolio_website
+from tokens import get_token
 import configparser
 
 config = configparser.ConfigParser()
@@ -21,7 +22,10 @@ api = Api(app)
 cors = CORS(app)
 mongoengine.connect(config["MONGODB"]["HOST"])
 
-
+class Tokens(Resource):
+    def get(self):
+        return get_token(request.headers.get("Authorization"),request.args.get("token_addr"))
+    
 class Notifications(Resource):
     def get(self):
         return fetch_notifications(request.headers.get("Authorization"))
@@ -137,7 +141,6 @@ api.add_resource(NotificationsRead, "/notifications/read")
 api.add_resource(Projects, "/projects")
 api.add_resource(ProjectsMinified, "/projects/minified")
 api.add_resource(Issues, "/issues")
-# api.add_resource(IssuePRs, "/issues/pr")
 api.add_resource(Roadmaps, "/roadmaps")
 api.add_resource(RoadmapObjectives, "/roadmaps/objectives")
 api.add_resource(ProfileContributions, "/profile/contributions")
@@ -149,6 +152,6 @@ api.add_resource(SanityCheck, "/")
 api.add_resource(HomepageAPI, "/home")
 api.add_resource(UpdateProgress, "/progress/new")
 api.add_resource(JobsPreSignups, "/waitlist/jobs")
-
+api.add_resource(Tokens,"/tokens")
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=8001, debug=True)
