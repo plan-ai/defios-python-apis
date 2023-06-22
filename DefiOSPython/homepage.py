@@ -47,7 +47,9 @@ def fetch_homepage(token):
     try:
         message = {}
 
-        message["tokens"] = Token.objects.aggregate([{"$sample": {"size": 4}}])
+        message["tokens"] = Token.objects(token_new=True).aggregate(
+            [{"$sample": {"size": 4}}]
+        )
         message["tokens"] = [i for i in message["tokens"]]
         for i in message["tokens"]:
             del i["_id"]
