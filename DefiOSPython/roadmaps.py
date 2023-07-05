@@ -56,7 +56,7 @@ def get_roadmaps(token, request_params):
                     "$gte": float(
                         filter_params["roadmap_active_objectives"].split(",")[0]
                     ),
-                    "$lt": float(
+                    "$lte": float(
                         filter_params["roadmap_active_objectives"].split(",")[1]
                     ),
                 }
