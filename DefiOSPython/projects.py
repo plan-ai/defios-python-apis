@@ -81,6 +81,9 @@ def fetch_projects(token, request_params):
                 .parse_to_json(resp.user_github)
             )
             message["projects"].insert(0, start_project)
+        if "is_token_native" in filter_params:
+            message["projects"] = remove_dups_by_id(message["projects"],True)
+        else:
             message["projects"] = remove_dups_by_id(message["projects"])
 
         status_code = 200
