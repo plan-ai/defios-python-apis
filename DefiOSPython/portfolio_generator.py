@@ -14,12 +14,8 @@ cdn = config["AWS"]["CDN"]
 
 
 def generate_website(requestData):
-    # converts educational credentials sent into markup langauge for templating
-    for i in requestData["education"]:
-        i["summary"] = markupsafe.Markup(i["summary"])
-
     # opens jinja2 template with requested template_no
-    template = open("../templates/template_{}.html".format(requestData["template_no"]))
+    template = open("../templates/{}.html".format(requestData["template_no"]))
     template = Template(template.read())
 
     # renders portfolio of user in requested template
@@ -55,7 +51,7 @@ def generate_portfolio_website(token, template_type):
         }
         message = {"link": generate_website(requestData)}
         status_code = 200
-    except:
-        message = {"error": "ProfileURLCreationFailed"}
+    except Exception as err:
+        message = {"error": "ProfileURLCreationFailed","reason":repr(err)}
         status_code = 400
     return make_response(jsonify(message), status_code)
