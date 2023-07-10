@@ -220,7 +220,7 @@ class Roadmaps(Document):
         ],
     )
     roadmap_description = StringField(required=False)
-    roadmap_project = ReferenceField(Projects)
+    roadmap_project = StringField()
 
     def to_roadmap_json(self):
         return {
@@ -229,10 +229,10 @@ class Roadmaps(Document):
             "outlook": "" if self.roadmap_outlook is None else self.roadmap_outlook,
             "project": ""
             if self.roadmap_project is None
-            else str(self.roadmap_project.id),
+            else str(self.roadmap_project),
             "project_account": ""
             if self.roadmap_project is None
-            else self.roadmap_project.project_account,
+            else self.roadmap_project,
             "title": self.roadmap_title,
             "description": self.roadmap_description,
             "creation_date": datetime.strftime(

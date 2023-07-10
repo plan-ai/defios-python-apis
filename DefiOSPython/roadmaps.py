@@ -2,7 +2,6 @@ from models import Roadmaps, RoadmapObjective, Projects
 from authentication import validate_user
 from flask import jsonify, make_response
 
-
 def get_roadmaps(token, request_params):
     """
     Used to fetch roadmaps given one or more set of filters
