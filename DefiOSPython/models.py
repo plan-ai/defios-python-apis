@@ -9,7 +9,7 @@ default_token_dict = {
     "token_symbol": "ITD",
     "token_name": "ItadakimasuDollar",
     "token_image_url": "https://ipfs.io/ipfs/QmZDH8LNFytG1YaMHcAaBEMFgAK56HCd2vbuTqwbvB1thN",
-    "token_new":False
+    "token_new": False,
 }
 
 

@@ -82,7 +82,7 @@ def fetch_projects(token, request_params):
             )
             message["projects"].insert(0, start_project)
         if "is_token_native" in filter_params:
-            message["projects"] = remove_dups_by_id(message["projects"],True)
+            message["projects"] = remove_dups_by_id(message["projects"], True)
         else:
             message["projects"] = remove_dups_by_id(message["projects"])
 
@@ -166,13 +166,13 @@ def fetch_projects_minified(token):
     return make_response(jsonify(message), status_code)
 
 
-def edit_token(auth: str, project_key: str, args: dict):
+def edit_token(auth: str, project_id: str, args: dict):
     isAuthorized, resp = validate_user(auth)
     if not isAuthorized:
         return resp
     try:
         project = (
-            Projects.objects(project_account=project_key)
+            Projects.objects(project_account=project_id)
             .only("project_owner_github")
             .first()
         )

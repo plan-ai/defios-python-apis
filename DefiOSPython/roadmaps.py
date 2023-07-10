@@ -1,4 +1,4 @@
-from models import Roadmaps, RoadmapObjective
+from models import Roadmaps, RoadmapObjective, Projects
 from authentication import validate_user
 from flask import jsonify, make_response
 
@@ -104,9 +104,32 @@ def get_roadmap_objectives(auth: str, roadmap_key: str):
                 "objective_graph": roadmap.roadmap_objectives_graph,
                 "objectives_list": objective_list,
             }
-            print(message)
             status_code = 200
     except Exception as err:
         message = {"error": "FetchRoadmapObjectivesFailed", "reason": repr(err)}
+        status_code = 400
+    return make_response(jsonify(message), status_code)
+
+
+def get_roadmap_projects(auth: str, project_key: str):
+    isAuthorized, resp = validate_user(auth)
+    if not isAuthorized:
+        return resp
+    try:
+        project = Projects.objects(id=project_key).first()
+        roadmaps = Roadmaps.objects(roadmap_project=project)
+        roadmap_list = []
+        for roadmap in roadmaps:
+            roadmap = roadmap.to_mongo().to_dict()
+            del roadmap["_id"]
+            roadmap["roadmap_project"] = str(roadmap["roadmap_project"])
+            roadmap_list.append(roadmap)
+        message = {
+            "project_key": project_key,
+            "roadmap_list": roadmap_list,
+        }
+        status_code = 200
+    except Exception as err:
+        message = {"error": "FetchRoadmapFailed", "reason": repr(err)}
         status_code = 400
     return make_response(jsonify(message), status_code)

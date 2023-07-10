@@ -9,7 +9,7 @@ def isfloat(num):
         return False
 
 
-def remove_dups_by_id(obj_array,check_is_native_token=False):
+def remove_dups_by_id(obj_array, check_is_native_token=False):
     new_obj_array = []
     key_exists = defaultdict(int)
     for obj in obj_array:

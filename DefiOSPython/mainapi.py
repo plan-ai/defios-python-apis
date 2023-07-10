@@ -7,7 +7,7 @@ from notifications import fetch_notifications, post_notifications, mark_notifs_a
 from projects import fetch_projects, fetch_projects_minified, edit_token
 from issues import fetch_issues
 from user_profile import profile_contributions, update_user_progress
-from roadmaps import get_roadmaps, get_roadmap_objectives
+from roadmaps import get_roadmaps, get_roadmap_objectives, get_roadmap_projects
 from homepage import fetch_homepage
 from swap import fetch_token_details, fetch_token_list
 from portfolio_generator import generate_portfolio_website
@@ -140,6 +140,13 @@ class JobsPreSignups(Resource):
         return add_to_waitlist(request.args.get("email"), request.args.get("wl_type"))
 
 
+class RoadmapProjects(Resource):
+    def get(self):
+        return get_roadmap_projects(
+            request.headers.get("Authorization"), request.args.get("project_id")
+        )
+
+
 api.add_resource(Notifications, "/notifications")
 api.add_resource(NotificationsRead, "/notifications/read")
 api.add_resource(Projects, "/projects")
@@ -157,5 +164,6 @@ api.add_resource(HomepageAPI, "/home")
 api.add_resource(UpdateProgress, "/progress/new")
 api.add_resource(JobsPreSignups, "/waitlist/jobs")
 api.add_resource(Tokens, "/tokens")
+api.add_resource(RoadmapProjects, "/roadmaps/project")
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=8001, debug=True)

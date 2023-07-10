@@ -52,6 +52,6 @@ def generate_portfolio_website(token, template_type):
         message = {"link": generate_website(requestData)}
         status_code = 200
     except Exception as err:
-        message = {"error": "ProfileURLCreationFailed","reason":repr(err)}
+        message = {"error": "ProfileURLCreationFailed", "reason": repr(err)}
         status_code = 400
     return make_response(jsonify(message), status_code)

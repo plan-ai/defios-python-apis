@@ -20,11 +20,10 @@
     <!-- Theme CSS -->
     <link id="theme-style" rel="stylesheet" href="https://userportfolios.s3.ap-south-1.amazonaws.com/styles.css">
 </head>
-
 <body>
     <header class="header">
         <div class="container clearfix">
-            <img class="profile-image img-fluid float-left" src="{{ data['profile_pic_url'] }}" alt={{ data['profile_name'] }}
+            <img class="profile-image img-fluid float-left" src="{{ data['profile_pic_url'] }}" alt="{{ data['profile_name'] }}"
                 style="width: 200px; height: 200px; background-position: center center; background-repeat: no-repeat; border-radius: 50%;" />
             <div class="profile-content float-left">
                 <h1 class="name">{{ data['profile_name'] }}</h1>
