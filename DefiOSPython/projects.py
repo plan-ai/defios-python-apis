@@ -139,7 +139,11 @@ def fetch_projects_minified(token):
         return resp
     try:
         projects = Projects.objects.only(
-            "project_name", "project_token", "project_repo_link", "project_account"
+            "project_name",
+            "project_token",
+            "project_repo_link",
+            "project_account",
+            "project_github_id",
         ).all()
         message = []
         for project in projects:
@@ -157,6 +161,9 @@ def fetch_projects_minified(token):
                     "project_url": "https://github.com/defi-os/defios-alpha"
                     if project.project_repo_link == ""
                     else project.project_repo_link,
+                    "project_github_id": ""
+                    if project.project_github_id is None
+                    else project.project_github_id,
                 }
             )
         status_code = 200

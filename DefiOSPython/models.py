@@ -139,6 +139,7 @@ class Projects(Document):
     coins_staked = FloatField(default=0)
     coins_rewarded = FloatField(default=0)
     claimers_pending = ListField(StringField())
+    project_github_id = StringField()
 
     def parse_to_json(self, github_id=""):
         project_json = self.to_mongo().to_dict()
