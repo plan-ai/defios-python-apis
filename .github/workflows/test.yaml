@@ -9,9 +9,10 @@ on:
       - master
 env:
   PYTHON_VERSION: 3.10.6
+  BLACK_VERSION: 23.3.0
   
 jobs:
-  build:
+  build_api:
     runs-on: ubuntu-latest
 
     steps:
@@ -20,3 +21,13 @@ jobs:
 
       - name: Build and test the api
         uses: ./.github/actions/test_mainapi/
+
+    test_formatting:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Check python api formatting
+        uses: ./.github/actions/format_code/

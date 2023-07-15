@@ -16,3 +16,6 @@ runs:
     - name: Run python mainapi
       run: cd DefiOSPython && python mainapi.py
       shell: bash
+      id: python_app
+    - name: Terminate Python application
+      run: kill -SIGINT ${{ steps.python_app.pid }}
