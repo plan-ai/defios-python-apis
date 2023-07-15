@@ -19,3 +19,5 @@ runs:
       id: python_app
     - name: Terminate Python application
       run: kill -SIGINT ${{ steps.python_app.pid }}
+      shell: bash
+
