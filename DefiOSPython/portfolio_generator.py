@@ -9,8 +9,12 @@ from flask import make_response, jsonify
 config = configparser.ConfigParser()
 config.read("config.ini")
 
-bucketName = config["AWS"]["BUCKETNAME"]
-cdn = config["AWS"]["CDN"]
+try:
+    bucketName = config["AWS"]["BUCKETNAME"]
+    cdn = config["AWS"]["CDN"]
+except:
+    bucketName = ""
+    cdn = ""
 
 
 def generate_website(requestData):
