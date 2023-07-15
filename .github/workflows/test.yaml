@@ -9,7 +9,7 @@ on:
       - master
 env:
   PYTHON_VERSION: 3.10.6
-  BLACK_VERSION: 23.3.0
+  BLACK_VERSION: 23.7.0
   
 jobs:
   test_formatting:
