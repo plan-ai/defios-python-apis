@@ -12,5 +12,5 @@ runs:
         python setup.py install
       shell: bash
     - name: Run python mainapi
-      run: cd DefiOSPython & python mainapi.py
+      run: cd DefiOSPython && python mainapi.py
       shell: bash
