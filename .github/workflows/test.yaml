@@ -22,7 +22,7 @@ jobs:
       - name: Build and test the api
         uses: ./.github/actions/test_mainapi/
 
-    test_formatting:
+  test_formatting:
     runs-on: ubuntu-latest
 
     steps:
