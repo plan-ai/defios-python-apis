@@ -1,0 +1,22 @@
+name: Test Flask API
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+env:
+  PYTHON_VERSION: 3.10.6
+  
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Build and test the api
+        uses: ./.github/actions/test_mainapi/
