@@ -1,0 +1,21 @@
+name: "Setup Python and test if mainapi works"
+description: "Setup Python and test if mainapi works"
+runs:
+  using: "composite"
+  steps:
+    - uses: actions/setup-python@v4
+      with:
+        python-version: ${{ env.PYTHON_VERSION }} 
+    - name: Sets up mongodb
+      uses: supercharge/mongodb-github-action@1.9.0
+    - name: Builds python dependencies
+      run: |
+        python -m pip install --upgrade pip
+        python setup.py install
+      shell: bash
+    - name: Run python mainapi
+      run: |
+        cd DefiOSPython && nohup python mainapi.py > output.log
+        cat output.log
+      shell: bash
+      id: python_app

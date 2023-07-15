@@ -20,7 +20,10 @@ config.read("config.ini")
 app = Flask(__name__)
 api = Api(app)
 cors = CORS(app)
-mongoengine.connect(config["MONGODB"]["HOST"])
+try:
+    mongoengine.connect(config["MONGODB"]["HOST"])
+except:
+    mongoengine.connect("DefiOS")
 
 
 class Tokens(Resource):

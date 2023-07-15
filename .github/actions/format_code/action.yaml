@@ -1,0 +1,16 @@
+name: "Formats python code according to PEP8 standards"
+description: "Formats python code according to PEP8 standards"
+runs:
+  using: "composite"
+  steps:
+    - uses: actions/setup-python@v4
+      with:
+        python-version: ${{ env.PYTHON_VERSION }} 
+    - name: Builds python black 
+      run: |
+        python -m pip install --upgrade pip
+        pip install black==${{ env.BLACK_VERSION }}
+      shell: bash
+    - name: Tests formatting of code
+      run: black --check --diff .
+      shell: bash
