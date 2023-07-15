@@ -14,7 +14,9 @@ runs:
         python setup.py install
       shell: bash
     - name: Run python mainapi
-      run: cd DefiOSPython && python mainapi.py
+      run: |
+        cd DefiOSPython && nohup python mainapi.py > output.log 2>&1 &
+        echo $! > python_app.pid
       shell: bash
       id: python_app
     - name: Terminate Python application
