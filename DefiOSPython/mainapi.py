@@ -152,10 +152,10 @@ class RoadmapProjects(Resource):
 
 
 class Mixpanel(Resource):
-    def get(self, path):
+    def get(self, path=""):
         return api_request(path, request)
 
-    def post(self, path):
+    def post(self, path=""):
         return api_request(path, request)
 
 
@@ -177,6 +177,6 @@ api.add_resource(UpdateProgress, "/progress/new")
 api.add_resource(JobsPreSignups, "/waitlist/jobs")
 api.add_resource(Tokens, "/tokens")
 api.add_resource(RoadmapProjects, "/roadmaps/project")
-api.add_resource(Mixpanel, "/mixpanel/proxy/<path>")
+api.add_resource(Mixpanel, "/mixpanel/proxy/<string:path>/")
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=8001, debug=True)
