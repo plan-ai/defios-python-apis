@@ -4,12 +4,9 @@ FROM python:3.10-slim-buster
 
 WORKDIR /DefiOSPython
 
-
-COPY requirements.txt requirements.txt
-RUN pip3 install -r requirements.txt
-COPY /DefiOSPython /DefiOSPython
-
+COPY / /DefiOSPython
+RUN python3 setup.py install
 
 EXPOSE 5000
 
-CMD [ "python3","mainapi.py"]
+CMD cd DefiOSPython && python3 wsgi.py
