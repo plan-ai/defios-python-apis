@@ -12,6 +12,7 @@ from homepage import fetch_homepage
 from swap import fetch_token_details, fetch_token_list
 from portfolio_generator import generate_portfolio_website
 from tokens import get_token
+from mixpanel_proxy import api_request
 import configparser
 
 config = configparser.ConfigParser()
@@ -150,6 +151,14 @@ class RoadmapProjects(Resource):
         )
 
 
+class Mixpanel(Resource):
+    def get(self, path):
+        return api_request(path, request)
+
+    def post(self, path):
+        return api_request(path, request)
+
+
 api.add_resource(Notifications, "/notifications")
 api.add_resource(NotificationsRead, "/notifications/read")
 api.add_resource(Projects, "/projects")
@@ -168,5 +177,6 @@ api.add_resource(UpdateProgress, "/progress/new")
 api.add_resource(JobsPreSignups, "/waitlist/jobs")
 api.add_resource(Tokens, "/tokens")
 api.add_resource(RoadmapProjects, "/roadmaps/project")
+api.add_resource(Mixpanel, "/mixpanel/proxy/<path>")
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=8001, debug=True)
