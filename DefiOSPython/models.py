@@ -59,6 +59,9 @@ class Users(Document):
     user_profile_pic = URLField()
     user_contributions = EmbeddedDocumentListField(Contributions)
     user_progress = EmbeddedDocumentListField(ProgressItem)
+    user_type = StringField(
+        default="contributor", options=["contributor", "repo_owner"]
+    )
 
     def fetch_contributions(self):
         contributions = self.to_mongo().to_dict()["user_contributions"]

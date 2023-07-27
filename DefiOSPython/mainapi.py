@@ -13,6 +13,7 @@ from swap import fetch_token_details, fetch_token_list
 from portfolio_generator import generate_portfolio_website
 from tokens import get_token
 from mixpanel_proxy import api_request
+from track_user_type import track_user_type
 import configparser
 
 config = configparser.ConfigParser()
@@ -59,6 +60,14 @@ class Projects(Resource):
 class Issues(Resource):
     def get(self):
         return fetch_issues(request.headers.get("Authorization"), request.args)
+
+
+class TrackUserType(Resource):
+    def post(self):
+        return track_user_type(
+            request.headers.get("Authorization"),
+            request.args.get("user_type", "contributor"),
+        )
 
 
 class Roadmaps(Resource):
@@ -178,5 +187,6 @@ api.add_resource(JobsPreSignups, "/waitlist/jobs")
 api.add_resource(Tokens, "/tokens")
 api.add_resource(RoadmapProjects, "/roadmaps/project")
 api.add_resource(Mixpanel, "/mixpanel/proxy/<string:path>/")
+api.add_resource(TrackUserType, "/track/user/type")
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=8001, debug=True)
