@@ -1,0 +1,7 @@
+#!/bin/bash
+
+#install black
+pip install black
+
+# Run black on all Python files in the repository
+black ../.
