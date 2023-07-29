@@ -1,10 +1,7 @@
 #!/bin/bash
 
-# Stash any unstaged changes, so we can run black on all files
-git stash -q --keep-index
+#install black
+pip install black
 
 # Run black on all Python files in the repository
 black .
-
-# Restore the stashed changes
-git stash pop -q
