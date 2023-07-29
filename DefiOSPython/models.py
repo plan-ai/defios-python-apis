@@ -59,8 +59,9 @@ class Users(Document):
     user_profile_pic = URLField()
     user_contributions = EmbeddedDocumentListField(Contributions)
     user_progress = EmbeddedDocumentListField(ProgressItem)
+    
     user_type = StringField(
-        default="contributor", options=["contributor", "repo_owner"]
+        default="unchoosen", options=["contributor", "repo_owner", "unchoosen"]
     )
 
     def fetch_contributions(self):
