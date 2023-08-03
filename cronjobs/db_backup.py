@@ -7,7 +7,7 @@ import configparser
 
 config = configparser.ConfigParser()
 current_path = os.path.abspath(__file__)
-config.read(f"{current_path.rsplit('/',maxsplit=1)[0]}/config.ini")
+config.read(f"{current_path.rsplit('/',maxsplit=2)[0]}/DefiOSPython/config.ini")
 
 session = boto3.Session(
     aws_access_key_id=config["AWS"]["S3_ACCESS_KEY"],
