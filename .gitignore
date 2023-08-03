@@ -169,3 +169,6 @@ test.py
 
 #ignore backup folder
 DefiOSPython/backups
+
+#ignore API DOCS folder
+API_DOCS/
