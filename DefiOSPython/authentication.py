@@ -5,6 +5,17 @@ from flask import make_response, jsonify
 import requests
 
 
+def parse_emails(emails_json):
+    emails = []
+    for email_json in emails_json:
+        email = email_json["email"]
+        if len(email.split("users.noreply.github.com")) == 1:
+            emails.append(email)
+            if email_json["primary"] == True:
+                primary_email = email
+    return emails, primary_email
+
+
 def verify_gh_access_token(github_uid, gh_access_token):
     """
     Used as an internal helper function to validate if the
@@ -20,8 +31,15 @@ def verify_gh_access_token(github_uid, gh_access_token):
     }
     response = requests.get(url, headers=headers).json()
     if int(github_uid) != response["id"]:
-        return False, None, None
-    return True, response["name"], response["avatar_url"]
+        return False, None, None, None, None
+    email_response = requests.get(
+        "https://api.github.com/user/emails", headers=headers
+    ).json()
+    try:
+        emails, primary_email = parse_emails(email_response)
+    except:
+        emails, primary_email = None, None
+    return True, response["name"], response["avatar_url"], emails, primary_email
 
 
 def set_progress_init(user):
@@ -91,9 +109,13 @@ def generate_jwt(github_uid, firebase_uid, gh_access_token, pub_key):
              Unique firebase uid of the user
     """
     try:
-        is_gh_valid, user_gh_name, user_gh_profile_pic = verify_gh_access_token(
-            github_uid, gh_access_token
-        )
+        (
+            is_gh_valid,
+            user_gh_name,
+            user_gh_profile_pic,
+            emails,
+            primary_email,
+        ) = verify_gh_access_token(github_uid, gh_access_token)
         if not is_gh_valid:
             raise Exception
         user = Users.objects(user_github=github_uid).first()
@@ -104,6 +126,9 @@ def generate_jwt(github_uid, firebase_uid, gh_access_token, pub_key):
                 user_gh_name=user_gh_name,
                 user_profile_pic=user_gh_profile_pic,
                 user_phantom_address=pub_key,
+                user_github_auth=gh_access_token,
+                user_email=emails,
+                user_primary_email=primary_email,
             )
             user.save()
             set_progress_init(user)

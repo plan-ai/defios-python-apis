@@ -18,8 +18,7 @@ s3 = session.client("s3")
 now = datetime.now()
 
 
-def create_folder_backup(dbname):
-    dt = datetime.now()
+def create_folder_backup():
     directory = "backups/bk"
     if not os.path.exists(directory):
         os.makedirs(directory)
@@ -31,7 +30,7 @@ def run_backup(mongoUri, dbname):
     db = client[dbname]
     collections = db.list_collection_names()
     files_to_compress = []
-    directory = create_folder_backup(dbname)
+    directory = create_folder_backup()
     for collection in collections:
         db_collection = db[collection]
         cursor = db_collection.find({})

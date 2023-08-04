@@ -14,6 +14,7 @@ from portfolio_generator import generate_portfolio_website
 from tokens import get_token
 from mixpanel_proxy import api_request
 from track_user_type import track_user_type
+from learn import learn_search
 import configparser
 
 config = configparser.ConfigParser()
@@ -168,6 +169,13 @@ class Mixpanel(Resource):
         return api_request(path, request)
 
 
+class LearnSearch(Resource):
+    def get(self):
+        return learn_search(
+            request.headers.get("Authorization"), request.get_json().get("user_request")
+        )
+
+
 api.add_resource(Notifications, "/notifications")
 api.add_resource(NotificationsRead, "/notifications/read")
 api.add_resource(Projects, "/projects")
@@ -188,5 +196,6 @@ api.add_resource(Tokens, "/tokens")
 api.add_resource(RoadmapProjects, "/roadmaps/project")
 api.add_resource(Mixpanel, "/mixpanel/proxy/<string:path>/")
 api.add_resource(TrackUserType, "/track/user/type")
+api.add_resource(LearnSearch, "/learn/search")
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=8001, debug=True)

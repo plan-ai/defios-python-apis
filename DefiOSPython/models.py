@@ -62,6 +62,10 @@ class Users(Document):
     user_type = StringField(
         default="unchoosen", options=["contributor", "repo_owner", "unchoosen"]
     )
+    user_github_auth = StringField()
+    user_experiences = ListField(StringField)
+    user_email = ListField(EmailField)
+    user_primary_email = EmailField()
 
     def fetch_contributions(self):
         contributions = self.to_mongo().to_dict()["user_contributions"]

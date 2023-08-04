@@ -3,10 +3,13 @@
 # in current frameworks like Langchain, it might make sense to refactor this
 import openai
 import configparser
+from authentication import validate_user
+from flask import make_response, jsonify
 
 config = configparser.ConfigParser()
 config.read("config.ini")
 openai.api_key = config["OPENAI"]["API_KEY"]
+github_key = config["GITHUB"]["AUTH_TOKEN"]
 
 
 # reads content from file
@@ -36,19 +39,30 @@ def engineer_prompt(user_gh_name, user_experience, request, docs):
     He wants a roadmap of basic Github issues that he can solve to learn {}. 
     Can you please send him a list of 5 open github issues on current Solana repos that he can solve to 
     gain some basic experience in it. Make sure the issues are beginner friendly. 
-    Write a curl request to retrieve the issues.Assume that there may be no issues are labelled good first issues. 
-    Also write a curl to get most common repos in the space and push it to the issues api
+    Write a curl request to retrieve the issues.Assume that there may be no issues are labelled good first issues.
+    Make sure the issue is not assigned to any other github user.Also write a curl to get most common repos in the 
+    space and push it to the issues api.
     """.format(
         docs, user_gh_name, user_experience, request
     )
     return prompt
 
 
+# Function to parse curl command and extract URL, headers, etc.
+def parse_curl_command(curl_command):
+    print(curl_command)
+    parts = curl_command.split(" ")
+    for i, part in enumerate(parts):
+        if part.startswith('"https'):
+            return part.strip('"').split('"')[0]
+    return None
+
+
 # parses curl from response
 def parse_curl(response):
     curl_split = response.split("curl")[1:]
     return [
-        "curl " + split_string.strip().replace("<YOUR-TOKEN>", openai.api_key)
+        parse_curl_command(split_string.strip().replace("<YOUR-TOKEN>", openai.api_key))
         for split_string in curl_split
     ]
 
@@ -64,6 +78,38 @@ def paerse_chatgpt_response(prompt):
         top_response = response.choices[0].text.strip()
         return parse_curl(top_response)
     except openai.OpenAIError as e:
-        # Handle errors, if any
-        print("Error:", e)
         return None
+
+
+def learn_search(token, request):
+    isAuthorized, resp = validate_user(token)
+    if not isAuthorized:
+        return resp
+    try:
+        prompt = engineer_prompt(
+            resp.user_gh_name,
+            ""
+            if resp.user_experiences is None
+            else ", ".join(resp.user_experiences[:-1])
+            + ", and "
+            + resp.user_experiences[-1],
+            request,
+            issue_search_api_docs,
+        )
+        response = paerse_chatgpt_response(prompt)
+        if response is None:
+            message = {"error": "OpenAICallFailed"}
+            status_code = 400
+        else:
+            api_key = (
+                github_key if resp.user_github_auth is None else resp.user_github_auth
+            )
+            message = {
+                "learn_search_user": resp.user_github,
+                "search_results": response,
+            }
+            status_code = 200
+    except Exception as err:
+        message = {"error": "LearnSearchFailed", "reason": repr(err)}
+        status_code = 400
+    return make_response(jsonify(message), status_code)
