@@ -190,3 +190,34 @@ def learn_search(token, request):
         message = {"error": "LearnSearchFailed", "reason": repr(err)}
         status_code = 400
     return make_response(jsonify(message), status_code)
+
+
+def resume_last_roadmap(token):
+    isAuthorized, resp = validate_user(token)
+    if not isAuthorized:
+        return resp
+    try:
+        github_api_key = (
+            github_key if resp.user_github_auth is None else resp.user_github_auth
+        )
+        cached_roadmap = resp.user_cached_learn_search
+        if len(cached_roadmap) == 0:
+            message = {"error": "No Cached Roadmaps Found"}
+            status_code = 404
+        elif len(cached_roadmap) == 1:
+            issues = call_github_api(cached_roadmap[0], github_api_key)["items"][:5]
+        elif len(cached_roadmap) == 2:
+            issues = call_github_api(cached_roadmap[0], github_api_key)["items"][:3]
+            second_issues = call_github_api(cached_roadmap[1], github_api_key)["items"][
+                :2
+            ]
+            issues.extend(second_issues)
+        message = {
+            "learn_search_user": resp.user_github,
+            "search_results": issues,
+        }
+        status_code = 200
+    except Exception as err:
+        message = {"error": "ResumeRoadmapFailed", "reason": repr(err)}
+        status_code = 400
+    return make_response(jsonify(message), status_code)
