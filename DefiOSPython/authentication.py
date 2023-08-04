@@ -134,6 +134,11 @@ def generate_jwt(github_uid, firebase_uid, gh_access_token, pub_key):
             set_progress_init(user)
         else:
             user.update(set__user_fb_uid=firebase_uid)
+            if user.user_email is None or user.user_primary_email is None:
+                user.update(
+                    set__user_email = emails,
+                    set__user_primary_email = primary_email
+                )
         token = jwt.encode(
             {"github": github_uid, "firebase": firebase_uid},
             "efgiul211uif13r321342fhruedslrih3lfch3ruic3re",

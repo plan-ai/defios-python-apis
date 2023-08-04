@@ -64,7 +64,7 @@ class Users(Document):
     )
     user_github_auth = StringField()
     user_experiences = ListField(StringField)
-    user_email = ListField(EmailField)
+    user_email = ListField(EmailField())
     user_primary_email = EmailField()
 
     def fetch_contributions(self):
