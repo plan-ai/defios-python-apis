@@ -14,7 +14,7 @@ from portfolio_generator import generate_portfolio_website
 from tokens import get_token
 from mixpanel_proxy import api_request
 from track_user_type import track_user_type
-from learn import learn_search, resume_last_roadmap
+from learn import learn_search, resume_last_roadmap, get_featured_repo
 import configparser
 
 config = configparser.ConfigParser()
@@ -181,6 +181,12 @@ class LastLearnSearch(Resource):
         return resume_last_roadmap(request.headers.get("Authorization"))
 
 
+class GetDailyFeaturedData(Resource):
+    def get(self):
+        if request.args.get("daily_featured") == "repo":
+            return get_featured_repo(request.headers.get("Authorization"))
+
+
 api.add_resource(Notifications, "/notifications")
 api.add_resource(NotificationsRead, "/notifications/read")
 api.add_resource(Projects, "/projects")
@@ -203,5 +209,6 @@ api.add_resource(Mixpanel, "/mixpanel/proxy/<string:path>/")
 api.add_resource(TrackUserType, "/track/user/type")
 api.add_resource(LearnSearch, "/learn/search")
 api.add_resource(LastLearnSearch, "/learn/search/cached")
+api.add_resource(GetDailyFeaturedData, "/daily/featured")
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=8001, debug=True)

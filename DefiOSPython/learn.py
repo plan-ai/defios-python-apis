@@ -7,6 +7,7 @@ from authentication import validate_user
 from flask import make_response, jsonify
 import requests
 import urllib.parse
+from models import DailyFeatured
 import re
 
 
@@ -219,5 +220,33 @@ def resume_last_roadmap(token):
         status_code = 200
     except Exception as err:
         message = {"error": "ResumeRoadmapFailed", "reason": repr(err)}
+        status_code = 400
+    return make_response(jsonify(message), status_code)
+
+
+def get_featured_repo(token):
+    isAuthorized, resp = validate_user(token)
+    if not isAuthorized:
+        return resp
+    try:
+        daily_featured = DailyFeatured.objects().first()
+        if daily_featured is None:
+            message = {"message": "No Daily Featured repo"}
+            status_code = 404
+        else:
+            repo = daily_featured.featured_repo
+            github_api_key = (
+                github_key if resp.user_github_auth is None else resp.user_github_auth
+            )
+            response = call_github_api(
+                f"https://api.github.com/repos/{repo}", github_api_key
+            )
+            message = {
+                "featured_search_user": resp.user_github,
+                "featured_repo": response,
+            }
+            status_code = 200
+    except Exception as err:
+        message = {"error": "FeaturedRepoSearchFailed", "reason": repr(err)}
         status_code = 400
     return make_response(jsonify(message), status_code)

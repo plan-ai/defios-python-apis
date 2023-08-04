@@ -252,3 +252,7 @@ class Roadmaps(Document):
             "creator_name": self.roadmap_creator_gh_name,
             "cover_image": self.roadmap_cover_img_url,
         }
+
+
+class DailyFeatured(Document):
+    featured_repo = StringField()
