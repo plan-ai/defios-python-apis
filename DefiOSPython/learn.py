@@ -55,10 +55,11 @@ def engineer_prompt(user_gh_name, user_experience, request, docs):
     Now, imagine a user {}. {}.
     
     He wants a roadmap of basic Github issues that he can solve to learn {}. 
-    Can you please send him a list of 5 open github issues on current Solana repos that he can solve to 
+    Can you please send him a list of 5 open github issues on recent repos that he can solve to 
     gain some basic experience in it. Make sure the issues are beginner friendly. 
     Write a curl request to retrieve the issues.Assume that there may be no issues are labelled good first issues.
     Also write a curl to get most common repos in the space and push it to the issues api.
+    Send the curl for issue api first before the repo api call
     """.format(
         docs, user_gh_name, user_experience, request
     )
@@ -67,20 +68,27 @@ def engineer_prompt(user_gh_name, user_experience, request, docs):
 
 # Function to parse curl command and extract URL, headers, etc.
 def parse_curl_command(curl_command):
-    parts = curl_command.split(" ")
-    for _, part in enumerate(parts):
-        if part.startswith('"https'):
-            return part.strip('"').split('"')[0]
+    url = re.findall(r'"(https?://.*?)"', curl_command)
+    if len(url) != 0:
+        return url[0]
     return None
 
 
 # parses curl from response
 def parse_curl(response):
+    result = []
     curl_split = response.split("curl")[1:]
-    return [
-        parse_curl_command(split_string.strip().replace("<YOUR-TOKEN>", openai.api_key))
-        for split_string in curl_split
-    ]
+    for split_string in curl_split:
+        parsed_result = parse_curl_command(
+            split_string.strip().replace("<YOUR-TOKEN>", openai.api_key)
+        )
+        if parsed_result is not None:
+            result.append(parsed_result)
+    return result
+
+
+def add_issue_filter(issue_url):
+    return issue_url.split("q=")[0] + "q=is:issue+" + issue_url.split("q=")[1]
 
 
 def parse_chatgpt_response(prompt):
@@ -147,14 +155,20 @@ def learn_search(token, request):
             [issue_api, repo_api] = response
             repos = call_github_api(repo_api, github_api_key)
             common_repos = []
-            if repos["total_count"] != 0:
-                for repo in repos["items"]:
-                    if len(common_repos) > 2:
-                        break
-                    if "full_name" in repo.keys():
-                        common_repos.append(repo["full_name"])
-                    else:
-                        common_repos.append(f"{repo['owner']['login']}/{repo['name']}")
+            issue_api = add_issue_filter(issue_api)
+            try:
+                if "total_count" in repos.keys() and repos["total_count"] != 0:
+                    for repo in repos["items"]:
+                        if len(common_repos) > 2:
+                            break
+                        if "full_name" in repo.keys():
+                            common_repos.append(repo["full_name"])
+                        else:
+                            common_repos.append(
+                                f"{repo['owner']['login']}/{repo['name']}"
+                            )
+            except:
+                pass
             if len(issue_api.split("topic:")) > 1:
                 issue_api = (
                     issue_api.split("topic:")[0]
@@ -163,7 +177,8 @@ def learn_search(token, request):
             if common_repos != []:
                 issues = call_github_api(
                     change_repo_param(issue_api, common_repos[0]), github_api_key
-                )["items"][:3]
+                )
+                issues = issues["items"][:3]
                 second_issues = call_github_api(
                     change_repo_param(issue_api, common_repos[1]), github_api_key
                 )["items"][:2]
