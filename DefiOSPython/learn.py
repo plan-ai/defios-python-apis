@@ -121,10 +121,18 @@ def change_repo_param(url, new_repo):
         str: The modified URL with the updated 'repo' parameter.
     """
     # Use regular expression to find and replace the 'repo' parameter with the new repository name
-    pattern = r"repo:([\w\-]+\/[\w\-]+)"
-    modified_url = re.sub(pattern, f"repo:{new_repo}", url)
+    pattern = r"q:repo=([\w\-]+\/[\w\-]+)"
+    modified_url = re.sub(pattern, f"q:repo={new_repo}", url)
 
     return modified_url
+
+
+def remove_duplicates(input_list):
+    unique_list = []
+    for item in input_list:
+        if item not in unique_list:
+            unique_list.append(item)
+    return unique_list
 
 
 def learn_search(token, request):
@@ -151,8 +159,11 @@ def learn_search(token, request):
             github_api_key = (
                 github_key if resp.user_github_auth is None else resp.user_github_auth
             )
-            [issue_api, repo_api] = response
-            repos = call_github_api(repo_api, github_api_key)
+            try:
+                [issue_api, repo_api] = response
+                repos = call_github_api(repo_api, github_api_key)
+            except:
+                issue_api = response[0]
             common_repos = []
             issue_api = add_issue_filter(issue_api)
             try:
@@ -176,11 +187,12 @@ def learn_search(token, request):
             if common_repos != []:
                 issues = call_github_api(
                     change_repo_param(issue_api, common_repos[0]), github_api_key
-                )["items"][:3]
+                )["items"][:5]
                 second_issues = call_github_api(
                     change_repo_param(issue_api, common_repos[1]), github_api_key
-                )["items"][:-2]
+                )["items"][:-5]
                 issues.extend(second_issues)
+                issues = remove_duplicates(issues)[:5]
             else:
                 issues = issues = call_github_api(issue_api, github_api_key)["items"][
                     :5
@@ -195,7 +207,10 @@ def learn_search(token, request):
                 }
                 status_code = 200
                 cached_learn_search = [issue["html_url"] for issue in issues]
-                resp.update(set__user_cached_learn_search=cached_learn_search)
+                resp.update(
+                    set__user_cached_learn_search=cached_learn_search,
+                    set__user_cached_learn_query=request,
+                )
     except Exception as err:
         message = {"error": "LearnSearchFailed", "reason": repr(err)}
         status_code = 400
@@ -214,6 +229,7 @@ def resume_last_roadmap(token):
         else:
             message = {
                 "learn_search_user": resp.user_github,
+                "learn_search_last_query": resp.user_cached_learn_query,
                 "search_results": cached_roadmap,
             }
             status_code = 200

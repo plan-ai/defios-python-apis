@@ -67,6 +67,7 @@ class Users(Document):
     user_email = ListField(EmailField())
     user_primary_email = EmailField()
     user_cached_learn_search = ListField(URLField())
+    user_cached_learn_query = StringField()
 
     def fetch_contributions(self):
         contributions = self.to_mongo().to_dict()["user_contributions"]
