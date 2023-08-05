@@ -55,7 +55,7 @@ def engineer_prompt(user_gh_name, user_experience, request, docs):
     Now, imagine a user {}. {}.
     
     He wants a roadmap of basic Github issues that he can solve to learn {}. 
-    Can you please send him a list of 5 open github issues on recent repos that he can solve to 
+    Can you please send him a list of 5 open github issues on recent repos so that he can solve to 
     gain some basic experience in it. Make sure the issues are beginner friendly. 
     Write a curl request to retrieve the issues.Assume that there may be no issues are labelled good first issues.
     Also write a curl to get most common repos in the space and push it to the issues api.
@@ -132,7 +132,6 @@ def learn_search(token, request):
     if not isAuthorized:
         return resp
     try:
-        cached_learn_search = []
         prompt = engineer_prompt(
             resp.user_gh_name,
             ""
@@ -177,21 +176,15 @@ def learn_search(token, request):
             if common_repos != []:
                 issues = call_github_api(
                     change_repo_param(issue_api, common_repos[0]), github_api_key
-                )
-                issues = issues["items"][:3]
+                )["items"][:3]
                 second_issues = call_github_api(
                     change_repo_param(issue_api, common_repos[1]), github_api_key
-                )["items"][:2]
+                )["items"][:-2]
                 issues.extend(second_issues)
-                cached_learn_search = [
-                    change_repo_param(issue_api, common_repos[0]),
-                    change_repo_param(issue_api, common_repos[1]),
-                ]
             else:
                 issues = issues = call_github_api(issue_api, github_api_key)["items"][
                     :5
                 ]
-                cached_learn_search = [issue_api]
             if issues == []:
                 message = {"error": "Could not find any results"}
                 status_code = 404
@@ -201,6 +194,7 @@ def learn_search(token, request):
                     "search_results": issues,
                 }
                 status_code = 200
+                cached_learn_search = [issue["html_url"] for issue in issues]
                 resp.update(set__user_cached_learn_search=cached_learn_search)
     except Exception as err:
         message = {"error": "LearnSearchFailed", "reason": repr(err)}
@@ -213,26 +207,16 @@ def resume_last_roadmap(token):
     if not isAuthorized:
         return resp
     try:
-        github_api_key = (
-            github_key if resp.user_github_auth is None else resp.user_github_auth
-        )
         cached_roadmap = resp.user_cached_learn_search
         if len(cached_roadmap) == 0:
             message = {"error": "No Cached Roadmaps Found"}
             status_code = 404
-        elif len(cached_roadmap) == 1:
-            issues = call_github_api(cached_roadmap[0], github_api_key)["items"][:5]
-        elif len(cached_roadmap) == 2:
-            issues = call_github_api(cached_roadmap[0], github_api_key)["items"][:3]
-            second_issues = call_github_api(cached_roadmap[1], github_api_key)["items"][
-                :2
-            ]
-            issues.extend(second_issues)
-        message = {
-            "learn_search_user": resp.user_github,
-            "search_results": issues,
-        }
-        status_code = 200
+        else:
+            message = {
+                "learn_search_user": resp.user_github,
+                "search_results": cached_roadmap,
+            }
+            status_code = 200
     except Exception as err:
         message = {"error": "ResumeRoadmapFailed", "reason": repr(err)}
         status_code = 400
