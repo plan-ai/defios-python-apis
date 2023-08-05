@@ -206,9 +206,8 @@ def learn_search(token, request):
                     "search_results": issues,
                 }
                 status_code = 200
-                cached_learn_search = [issue["html_url"] for issue in issues]
                 resp.update(
-                    set__user_cached_learn_search=cached_learn_search,
+                    set__user_cached_learn_search=issues,
                     set__user_cached_learn_query=request,
                 )
     except Exception as err:

@@ -66,7 +66,7 @@ class Users(Document):
     user_experiences = ListField(StringField)
     user_email = ListField(EmailField())
     user_primary_email = EmailField()
-    user_cached_learn_search = ListField(URLField())
+    user_cached_learn_search = ListField(DictField())
     user_cached_learn_query = StringField()
 
     def fetch_contributions(self):
