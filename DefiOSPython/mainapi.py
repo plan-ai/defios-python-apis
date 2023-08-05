@@ -170,7 +170,7 @@ class Mixpanel(Resource):
 
 
 class LearnSearch(Resource):
-    def get(self):
+    def post(self):
         return learn_search(
             request.headers.get("Authorization"), request.get_json().get("user_request")
         )

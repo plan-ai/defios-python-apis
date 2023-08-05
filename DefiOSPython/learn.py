@@ -88,7 +88,9 @@ def parse_curl(response):
 
 
 def add_issue_filter(issue_url):
-    return issue_url.split("q=")[0] + "q=is:issue+" + issue_url.split("q=")[1]
+    return (
+        issue_url.split("q=")[0] + "q=is:issue+state:open+" + issue_url.split("q=")[1]
+    )
 
 
 def parse_chatgpt_response(prompt):
