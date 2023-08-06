@@ -28,6 +28,7 @@ config = configparser.ConfigParser()
 config.read("config.ini")
 openai.api_key = config["OPENAI"]["API_KEY"]
 github_key = config["GITHUB"]["AUTH_TOKEN"]
+youtube_api_key = config["YOUTUBE"]["API_KEY"]
 
 
 # reads content from file
@@ -137,6 +138,60 @@ def remove_duplicates(input_list):
     return unique_list
 
 
+def filter_youtube_data(youtube_videos):
+    final_youtube_data = []
+    for youtube_video in youtube_videos:
+        final_youtube_data.append(
+            {
+                "id": youtube_video["id"]["videoId"],
+                "title": youtube_video["snippet"]["title"],
+                "description": youtube_video["snippet"]["description"],
+                "mediumThumbnail": youtube_video["snippet"]["thumbnails"]["medium"][
+                    "url"
+                ],
+            }
+        )
+    return final_youtube_data
+
+
+def youtube_search(query, api_key, max_results=10):
+    base_url = "https://www.googleapis.com/youtube/v3/search"
+
+    params = {
+        "part": "snippet",
+        "q": query,
+        "type": "video",
+        "key": api_key,
+        "maxResults": max_results,
+    }
+
+    try:
+        response = requests.get(base_url, params=params)
+        response.raise_for_status()
+        data = response.json()
+
+        videos = filter_youtube_data(data["items"])
+
+        return videos
+    except requests.exceptions.RequestException as e:
+        print("Error calling YouTube API:", e)
+        return []
+
+
+def filter_issue_data(issues):
+    final_result = []
+    for issue in issues:
+        final_result.append(
+            {
+                "html_url": issue["html_url"],
+                "title": issue["title"],
+                "body": issue["body"],
+                "labels": issue["labels"],
+            }
+        )
+    return final_result
+
+
 def learn_search(token, request):
     isAuthorized, resp = validate_user(token)
     if not isAuthorized:
@@ -203,14 +258,20 @@ def learn_search(token, request):
                 message = {"error": "Could not find any results"}
                 status_code = 404
             else:
+                learning_resources = youtube_search(
+                    request, youtube_api_key, max_results=len(issues) // 2
+                )
+                issues = filter_issue_data(issues)
                 message = {
                     "learn_search_user": resp.user_github,
                     "search_results": issues,
+                    "learning_resources": learning_resources,
                 }
                 status_code = 200
                 resp.update(
                     set__user_cached_learn_search=issues,
                     set__user_cached_learn_query=request,
+                    set__user_cached_learning_resources=learning_resources,
                 )
     except Exception as err:
         message = {"error": "LearnSearchFailed", "reason": repr(err)}
@@ -231,6 +292,7 @@ def resume_last_roadmap(token):
             message = {
                 "learn_search_user": resp.user_github,
                 "learn_search_last_query": resp.user_cached_learn_query,
+                "learning_resources": resp.user_cached_learning_resources,
                 "search_results": cached_roadmap,
             }
             status_code = 200
