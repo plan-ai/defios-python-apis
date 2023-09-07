@@ -187,6 +187,7 @@ def filter_issue_data(issues):
                 "title": issue["title"],
                 "body": issue["body"],
                 "labels": issue["labels"],
+                "url": issue["url"],
             }
         )
     return final_result
@@ -266,6 +267,7 @@ def learn_search(token, request):
                     "learn_search_user": resp.user_github,
                     "search_results": issues,
                     "learning_resources": learning_resources,
+                    "learn_search_last_query": request,
                 }
                 status_code = 200
                 resp.update(

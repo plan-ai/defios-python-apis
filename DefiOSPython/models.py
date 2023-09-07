@@ -100,7 +100,7 @@ class IssuePRs(EmbeddedDocument):
     issue_pr_link = URLField()
     issue_originality_score = IntField()
     issue_author_github = StringField()
-    issue_title = StringField()
+    issue_pr_title = StringField()
     issue_vote_amount = IntField()
     issue_pr_github = StringField()
 
@@ -115,8 +115,7 @@ class Issues(Document):
     issue_summary = StringField()
     issue_gh_url = URLField()
     issue_stake_amount = FloatField()
-    issue_stake_token_symbol = StringField()
-    issue_stake_token_url = URLField()
+    issue_token = ReferenceField(Token)
     issue_prs = EmbeddedDocumentListField(IssuePRs)
     issue_tags = ListField(StringField())
     rewardee = StringField()
@@ -124,6 +123,13 @@ class Issues(Document):
     def parse_to_json(self):
         issue_json = self.to_mongo().to_dict()
         issue_json["_id"] = str(issue_json["_id"])
+        issue_json["issue_token"] = (
+            default_token_dict
+            if self.issue_token is None
+            else self.issue_token.to_mongo().to_dict()
+        )
+        if "_id" in issue_json["issue_token"]:
+            del issue_json["issue_token"]["_id"]
         return issue_json
 
 
