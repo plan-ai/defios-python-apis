@@ -121,7 +121,7 @@ class Issues(Document):
     issue_prs = EmbeddedDocumentListField(IssuePRs)
     issue_tags = ListField(StringField())
     rewardee = StringField()
-    reward_claimed = BooleanField()
+    reward_claimed = BooleanField(default = False)
 
     def parse_to_json(self):
         issue_json = self.to_mongo().to_dict()
