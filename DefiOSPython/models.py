@@ -1,34 +1,50 @@
 from mongoengine import Document, IntField, StringField, URLField, DictField
-from mongoengine import EmbeddedDocument, DateTimeField, ReferenceField, DynamicField
+from mongoengine import EmbeddedDocument, DateTimeField, ReferenceField
 from mongoengine import BooleanField, FloatField, ListField, EmbeddedDocumentListField
 from mongoengine import EmailField
 from datetime import datetime
-
-default_token_dict = {
-    "token_spl_addr": "E1r1HeJdpNuAfKDyBXoLG3i79cTretrCHoXWhhSKGUPt",
-    "token_symbol": "ITD",
-    "token_name": "ItadakimasuDollar",
-    "token_image_url": "https://ipfs.io/ipfs/QmZDH8LNFytG1YaMHcAaBEMFgAK56HCd2vbuTqwbvB1thN",
-    "token_new": False,
-}
 
 
 class Token(Document):
     token_name = StringField()
     token_spl_addr = StringField()
     token_symbol = StringField()
-    token_decimals = IntField()
     token_image_url = StringField()
-    token_price_feed = URLField()
-    token_ltp = FloatField()
-    token_ltp_24h_change = FloatField()
-    token_total_supply = IntField()
-    token_circulating_supply = IntField()
-    token_creator_name = StringField()
-    token_creation_date = DateTimeField()
-    token_repository_link = URLField()
+    token_decimals = IntField()
     token_new = BooleanField(default=True)
     meta = {"collection": "tokens"}
+
+
+class Projects(Document):
+    project_account = StringField()
+    project_owner_github = StringField()
+    project_token = ReferenceField(Token)
+    project_name = StringField()
+    project_repo_link = URLField()
+    num_open_issues = IntField()
+    contributions_graph = URLField()
+    is_token_native = BooleanField()
+    coins_staked = FloatField(default=0)
+    coins_rewarded = FloatField(default=0)
+    claimers_pending = ListField(StringField())
+    project_github_id = IntField()
+    community_health = IntField()
+    num_contributions = IntField()
+    num_contributions_chg_perc = IntField()
+
+    def parse_to_json(self, github_id=""):
+        project_json = self.to_mongo().to_dict()
+        project_json["_id"] = str(project_json["_id"])
+        project_json["project_token"] = self.project_token.to_mongo().to_dict()
+        if github_id in project_json["claimers_pending"]:
+            project_json["claimable"] = True
+        else:
+            project_json["claimable"] = False
+        project_json["coins_staked"] = self.coins_staked
+        project_json["coins_rewarded"] = self.coins_rewarded
+        if "_id" in project_json["project_token"]:
+            del project_json["project_token"]["_id"]
+        return project_json
 
 
 class Contributions(EmbeddedDocument):
@@ -36,11 +52,13 @@ class Contributions(EmbeddedDocument):
     contributor_github = StringField(required=True)
     contribution_link = URLField(required=True)
     contribution_timestamp = DateTimeField(required=True)
-    contributor_project_id = StringField(required=True)
-    contributor_project_name = StringField(required=True)
+    contribution_project = ReferenceField(Projects)
     contribution_amt = FloatField()
+    contribution_token = ReferenceField(Token)
+    contributor_project_name = StringField()
     contribution_token_symbol = StringField()
-    contribution_token_icon = URLField()
+    contributor_project_id = ReferenceField(Projects)
+    contribution_token_icon = StringField()
 
 
 class ProgressItem(EmbeddedDocument):
@@ -98,13 +116,27 @@ class IssuePRs(EmbeddedDocument):
     issue_pr_account = StringField()
     issue_pr_author = StringField()
     issue_pr_link = URLField()
-    issue_originality_score = IntField()
     issue_author_github = StringField()
     issue_pr_github_name = StringField()
     issue_pr_title = StringField()
     issue_vote_amount = IntField()
     issue_pr_github = StringField()
     issue_pr_voters = ListField(StringField())
+
+
+class IssueStakers(EmbeddedDocument):
+    issue_staker_avatar = StringField()
+    issue_staker_name = StringField()
+    issue_staker_account = StringField()
+    issue_staker_github = StringField()
+    issue_staker_amount = StringField()
+
+
+class IssueStakeTimeline(EmbeddedDocument):
+    name = StringField()
+    value = IntField()
+    date = IntField()
+    data = DictField()
 
 
 class Issues(Document):
@@ -121,62 +153,17 @@ class Issues(Document):
     issue_prs = EmbeddedDocumentListField(IssuePRs)
     issue_tags = ListField(StringField())
     rewardee = StringField()
-    reward_claimed = BooleanField(default = False)
+    reward_claimed = BooleanField(default=False)
+    issue_stakers = EmbeddedDocumentListField(IssueStakers)
+    issue_stake_timeline = EmbeddedDocumentListField(IssueStakeTimeline)
 
     def parse_to_json(self):
         issue_json = self.to_mongo().to_dict()
         issue_json["_id"] = str(issue_json["_id"])
-        issue_json["issue_token"] = (
-            default_token_dict
-            if self.issue_token is None
-            else self.issue_token.to_mongo().to_dict()
-        )
+        issue_json["issue_token"] = self.issue_token.to_mongo().to_dict()
         if "_id" in issue_json["issue_token"]:
             del issue_json["issue_token"]["_id"]
         return issue_json
-
-
-class Projects(Document):
-    project_account = StringField()
-    project_owner_github = StringField()
-    project_token = ReferenceField(Token)
-    project_status = StringField(choices=["Secure", "Vulnerable", "Broken"])
-    project_name = StringField()
-    project_repo_link = URLField()
-    top_supporter_name = StringField()
-    top_supporter_address = StringField()
-    top_builder_name = StringField()
-    top_builder_address = StringField()
-    num_open_issues = IntField()
-    community_health = IntField()
-    community_health_graph = URLField()
-    num_contributions = IntField()
-    num_contributions_chg_perc = FloatField()
-    num_contributions_graph = URLField()
-    is_token_native = BooleanField()
-    internal_tags = DynamicField()
-    coins_staked = FloatField(default=0)
-    coins_rewarded = FloatField(default=0)
-    claimers_pending = ListField(StringField())
-    project_github_id = StringField()
-
-    def parse_to_json(self, github_id=""):
-        project_json = self.to_mongo().to_dict()
-        project_json["_id"] = str(project_json["_id"])
-        project_json["project_token"] = (
-            default_token_dict
-            if self.project_token is None
-            else self.project_token.to_mongo().to_dict()
-        )
-        if github_id in project_json["claimers_pending"]:
-            project_json["claimable"] = True
-        else:
-            project_json["claimable"] = False
-        project_json["coins_staked"] = self.coins_staked
-        project_json["coins_rewarded"] = self.coins_rewarded
-        if "_id" in project_json["project_token"]:
-            del project_json["project_token"]["_id"]
-        return project_json
 
 
 class Notifications(Document):

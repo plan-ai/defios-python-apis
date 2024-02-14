@@ -1,8 +1,11 @@
 import jwt
 from models import Users, ProgressItem, Waitlist
 from flask import make_response, jsonify
-
+import configparser
 import requests
+
+config = configparser.ConfigParser()
+config.read("config.ini")
 
 
 def parse_emails(emails_json):
@@ -140,7 +143,7 @@ def generate_jwt(github_uid, firebase_uid, gh_access_token, pub_key):
                 )
         token = jwt.encode(
             {"github": github_uid, "firebase": firebase_uid},
-            "efgiul211uif13r321342fhruedslrih3lfch3ruic3re",
+            config["API"]["SECRET_KEY"],
             "HS256",
         )
         message = {"auth_creds": token, "firebase": firebase_uid}
@@ -156,9 +159,7 @@ def validate_user(token):
         jsonify({"message": "Invalid or Expired User token"}), 401
     )
     try:
-        github_uid = jwt.decode(
-            token, "efgiul211uif13r321342fhruedslrih3lfch3ruic3re", ["HS256"]
-        )["github"]
+        github_uid = jwt.decode(token, config["API"]["SECRET_KEY"], ["HS256"])["github"]
         user = Users.objects(user_github=github_uid).first()
         if user is not None:
             return True, user
